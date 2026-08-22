@@ -5,13 +5,16 @@ import { FoodCard } from '../../components/student/FoodCard';
 import { OrderProgressWidget } from '../../components/student/OrderProgressWidget';
 import { SkeletonLoader } from '../../components/common/SkeletonLoader';
 import { formatCredits } from '../../utils/formatters';
-import { Wallet, ShoppingBag, CheckCircle2, Clock, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Wallet, ShoppingBag, CheckCircle2, Clock, Sparkles, Search, ArrowRight, Utensils, Coffee, Sun, Moon, Pizza, GlassWater } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const StudentDashboardPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   const fetchDashboard = async () => {
     try {
@@ -42,118 +45,149 @@ export const StudentDashboardPage = () => {
     }
   };
 
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/student/menu?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   if (loading) return <SkeletonLoader count={4} type="card" />;
 
   const { student, credits, stats, activeOrder, todayMenuPreview } = dashboardData || {};
 
+  // Categories list with circular design icons
+  const categories = [
+    { label: 'All', icon: Utensils, count: 'Menu' },
+    { label: 'Breakfast', icon: Sun, count: 'Morning' },
+    { label: 'Lunch', icon: Utensils, count: 'Afternoon' },
+    { label: 'Dinner', icon: Moon, count: 'Night' },
+    { label: 'Snacks', icon: Pizza, count: 'Bites' },
+    { label: 'Drinks', icon: GlassWater, count: 'Beverages' },
+  ];
+
+  const filteredPreview = todayMenuPreview?.filter(item => {
+    const matchesCat = selectedCategory === 'All' || item.category.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesSearch = !searchQuery || item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCat && matchesSearch;
+  }) || [];
+
   return (
-    <div className="space-y-8">
-      {/* Welcome Banner Card */}
-      <div className="relative bg-gradient-to-r from-[#1C0505] via-[#111111] to-[#0A0A0A] text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#331111] overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-[#E50914]/10 rounded-full blur-3xl" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#450A0A] text-[#FF2D2D] border border-[#7F1D1D] text-xs font-bold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" /> VIT Student Portal
-            </span>
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
-              Good Morning, <span className="text-[#FF2D2D]">{user?.name || 'Yash'}</span> 👋
-            </h1>
-            <p className="text-xs sm:text-sm text-[#A3A3A3]">
-              Registration ID: <span className="font-mono font-bold text-white">{student?.studentIdStr || '21BCE1042'}</span> • {student?.hostel || 'Block A, Mens Hostel'} ({student?.roomNumber})
-            </p>
+    <div className="space-y-8 max-w-[1300px] mx-auto">
+      {/* Top Greeting & Search Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#330808] border border-[#7F1D1D] text-[#FF2B2B] text-[11px] font-black tracking-widest uppercase">
+            <Sparkles className="w-3.5 h-3.5" /> SMART DIGITAL MESS
           </div>
-
-          <div className="bg-[#111111] border border-[#242424] rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-lg min-w-[240px]">
-            <div className="w-12 h-12 rounded-xl bg-[#450A0A] border border-[#7F1D1D] text-[#FF2D2D] flex items-center justify-center font-bold text-xl">
-              <Wallet className="w-6 h-6" />
-            </div>
-            <div>
-              <span className="text-xs text-[#A3A3A3] font-semibold uppercase block">Remaining Credits</span>
-              <span className="text-2xl font-black text-[#E50914]">{formatCredits(credits?.remaining || 8700)}</span>
-            </div>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            Good Evening, <span className="text-[#FF2B2B]">{user?.name || 'Yash'}</span> 👋
+          </h1>
+          <p className="text-xs text-[#888888]">
+            What's on the menu today? Order your daily meal instantly with Monthly Credits.
+          </p>
         </div>
+
+        {/* Global Search Bar */}
+        <form onSubmit={handleSearchSubmit} className="relative w-full md:w-80">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search food, category or dish..."
+            className="w-full pl-4 pr-10 py-3 text-xs bg-[#121212] text-white border border-[#222222] rounded-2xl focus:outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]/50 transition-all placeholder:text-[#555555]"
+          />
+          <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-[#737373] hover:text-[#FF2B2B] transition">
+            <Search className="w-4 h-4" />
+          </button>
+        </form>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <StatCard
-          title="Remaining Credits"
-          value={formatCredits(credits?.remaining)}
-          icon={Wallet}
-          color="red"
-          highlight
-        />
-        <StatCard
-          title="Orders This Month"
-          value={stats?.ordersThisMonth || 0}
-          icon={ShoppingBag}
-          color="dark"
-        />
-        <StatCard
-          title="Completed Orders"
-          value={stats?.completedOrders || 0}
-          icon={CheckCircle2}
-          color="dark"
-        />
-        <StatCard
-          title="Pending Orders"
-          value={stats?.pendingOrders || 0}
-          icon={Clock}
-          color="dark"
-        />
-      </div>
+      {/* Horizontal Circular Categories Section */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-black uppercase tracking-widest text-[#888888]">Meal Categories</h3>
+          <span className="text-[11px] text-[#555555]">Scroll horizontally →</span>
+        </div>
 
-      {/* Active Order Progress */}
+        <div className="flex items-center gap-4 overflow-x-auto pb-2 no-scrollbar">
+          {categories.map((cat) => {
+            const Icon = cat.icon;
+            const isSelected = selectedCategory === cat.label;
+            return (
+              <button
+                key={cat.label}
+                onClick={() => setSelectedCategory(cat.label)}
+                className="flex flex-col items-center gap-2 shrink-0 group transition"
+              >
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    isSelected
+                      ? 'bg-[#E50914] text-white ring-4 ring-[#E50914]/30 shadow-lg shadow-[#E50914]/40 scale-105'
+                      : 'bg-[#141414] border border-[#222222] text-[#737373] group-hover:border-[#7F1D1D] group-hover:text-white'
+                  }`}
+                >
+                  <Icon className="w-7 h-7" />
+                </div>
+                <span className={`text-xs font-bold transition ${isSelected ? 'text-white font-extrabold' : 'text-[#888888]'}`}>
+                  {cat.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Active Order Tracking Timeline Widget (if order present) */}
       {activeOrder && (
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <Clock className="w-5 h-5 text-[#E50914]" /> Active Order Progress
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-extrabold text-white flex items-center gap-2 uppercase tracking-wide">
+              <Clock className="w-4 h-4 text-[#E50914]" /> CURRENT ORDER STATUS
+            </h2>
+            <Link to="/student/current-order" className="text-xs font-bold text-[#FF2B2B] hover:underline">
+              Live Order Page →
+            </Link>
+          </div>
           <OrderProgressWidget order={activeOrder} onCancel={handleCancelOrder} />
         </section>
       )}
 
-      {/* Today's Menu Preview */}
+      {/* Popular Dishes Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-extrabold text-white">Today's Fresh Menu</h2>
-            <p className="text-xs text-[#A3A3A3]">Delicious Indian college mess dishes ready for token-free digital order</p>
+            <h2 className="text-lg font-black text-white tracking-tight">Popular Dishes</h2>
+            <p className="text-xs text-[#888888]">Freshly cooked meal options available for immediate pickup</p>
           </div>
           <Link
             to="/student/menu"
-            className="text-xs font-bold text-[#FF2D2D] hover:underline"
+            className="text-xs font-extrabold text-[#FF2B2B] hover:underline flex items-center gap-1"
           >
-            View Full Menu →
+            <span>View Full Menu</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {todayMenuPreview?.map((item) => (
-            <FoodCard key={item.id} item={item} />
-          ))}
-        </div>
+        {filteredPreview.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredPreview.map((item) => (
+              <FoodCard key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 text-center bg-[#141414] border border-[#222222] rounded-3xl space-y-2">
+            <p className="text-xs font-bold text-[#888888]">No food items match the selected filter.</p>
+            <button
+              onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }}
+              className="px-4 py-2 bg-[#1F1F1F] text-white text-xs font-bold rounded-xl hover:bg-[#330808] hover:text-[#FF2B2B]"
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );
 };
 
-const StatCard = ({ title, value, icon: Icon, highlight }) => {
-  return (
-    <div className={`bg-[#111111] border rounded-2xl p-5 shadow-sm flex items-center justify-between transition-all ${
-      highlight ? 'border-[#7F1D1D] bg-[#140808]' : 'border-[#242424]'
-    }`}>
-      <div>
-        <span className="text-xs text-[#A3A3A3] font-semibold uppercase tracking-wider block">{title}</span>
-        <h3 className={`text-2xl font-extrabold mt-1 ${highlight ? 'text-[#FF2D2D]' : 'text-white'}`}>{value}</h3>
-      </div>
-      <div className={`w-11 h-11 rounded-xl flex items-center justify-center border ${
-        highlight ? 'bg-[#450A0A] border-[#7F1D1D] text-[#FF2D2D]' : 'bg-[#151515] border-[#242424] text-[#A3A3A3]'
-      }`}>
-        <Icon className="w-5 h-5" />
-      </div>
-    </div>
-  );
-};

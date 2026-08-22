@@ -13,7 +13,8 @@ import {
   ChefHat,
   BarChart3,
   CheckSquare,
-  ShieldCheck
+  ShieldCheck,
+  UtensilsCrossed
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -68,27 +69,34 @@ export const Sidebar = ({ isOpen, onClose }) => {
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/80 backdrop-blur-md lg:hidden"
         />
       )}
 
       {/* Sidebar Drawer */}
       <aside
-        className={`fixed top-0 left-0 z-40 h-full w-64 bg-[#080808] border-r border-[#1F1F1F] flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-40 h-full w-60 bg-[#0B0B0B] border-r border-[#1C1C1C] flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        {/* Brand Header */}
         <div>
-          <div className="h-16 flex items-center px-6 border-b border-[#1F1F1F]">
-            <span className="text-xs font-bold tracking-widest text-[#E50914] uppercase flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#E50914]" />
-              {user?.role} Portal
-            </span>
+          {/* Logo & Brand Header */}
+          <div className="h-16 flex items-center px-5 border-b border-[#1A1A1A] gap-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#FF2B2B] to-[#B91C1C] text-white flex items-center justify-center shadow-lg shadow-[#E50914]/25 shrink-0">
+              <UtensilsCrossed className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="font-extrabold text-sm tracking-tight text-white block">
+                Smart <span className="text-[#FF2B2B]">Mess</span>
+              </span>
+              <span className="text-[10px] text-[#737373] tracking-widest uppercase font-semibold flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 text-[#E50914]" /> {user?.role} PORTAL
+              </span>
+            </div>
           </div>
 
           {/* Navigation Links */}
-          <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">
+          <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-8.5rem)] no-scrollbar">
             {navLinks.map((link) => {
               const Icon = link.icon;
               return (
@@ -98,21 +106,25 @@ export const Sidebar = ({ isOpen, onClose }) => {
                   end={link.path === '/student' || link.path === '/chef' || link.path === '/admin'}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    `flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-semibold transition border-l-4 ${
+                    `relative flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 ${
                       isActive
-                        ? 'bg-[#450A0A] border-[#E50914] text-white shadow-sm'
-                        : 'border-transparent text-[#A3A3A3] hover:bg-[#181010] hover:text-white'
+                        ? 'bg-[#260707] text-white border border-[#521010] shadow-sm'
+                        : 'text-[#888888] hover:bg-[#141414] hover:text-white'
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
+                      {/* Active Left Red Indicator Strip */}
+                      {isActive && (
+                        <span className="absolute left-0 top-2 bottom-2 w-1 bg-[#E50914] rounded-r-full shadow-md shadow-[#E50914]" />
+                      )}
                       <div className="flex items-center gap-3">
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-[#E50914]' : 'text-[#737373]'}`} />
+                        <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-[#FF2B2B]' : 'text-[#666666]'}`} />
                         <span>{link.label}</span>
                       </div>
                       {link.badge && (
-                        <span className="px-2 py-0.5 text-xs font-bold bg-[#E50914] text-white rounded-full">
+                        <span className="px-2 py-0.5 text-[10px] font-black bg-[#E50914] text-white rounded-full font-mono">
                           {link.badge}
                         </span>
                       )}
@@ -124,14 +136,20 @@ export const Sidebar = ({ isOpen, onClose }) => {
           </nav>
         </div>
 
-        {/* Footer Info */}
-        <div className="p-4 border-t border-[#1F1F1F]">
-          <div className="p-3 bg-[#111111] rounded-xl border border-[#242424] text-center">
-            <p className="text-[11px] font-semibold text-white">Smart Mess System</p>
-            <p className="text-[10px] text-[#737373] mt-0.5">VIT Mess SaaS v2.0</p>
+        {/* Footer User Info */}
+        <div className="p-3 border-t border-[#1A1A1A] bg-[#0E0E0E]">
+          <div className="p-3 bg-[#151515] rounded-xl border border-[#222222] flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-[#3D0A0A] border border-[#7F1D1D] text-[#FF2B2B] flex items-center justify-center font-black text-xs">
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-bold text-white truncate">{user?.name || 'User'}</p>
+              <p className="text-[10px] text-[#737373] truncate font-mono">{user?.email || 'vit.edu'}</p>
+            </div>
           </div>
         </div>
       </aside>
     </>
   );
 };
+
