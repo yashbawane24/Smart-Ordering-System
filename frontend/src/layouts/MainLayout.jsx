@@ -25,16 +25,16 @@ export const MainLayout = () => {
   return (
     <div className="min-h-screen bg-reference-outer text-white p-2 sm:p-4 md:p-6 lg:p-8 flex flex-col items-center justify-center font-sans">
       {/* Reference Outer Dashboard Shell Container */}
-      <div className="w-full max-w-[1550px] bg-[#1a1a1a] border border-[#2b2b2b] rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col relative min-h-[90vh]">
+      <div className="w-full max-w-[1550px] bg-[#1a1a1a] border border-[#2b2b2b] rounded-[32px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-row relative min-h-[90vh]">
         
-        {/* Top Navbar */}
-        <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        {/* Left Sidebar Column (Runs top to bottom of dashboard shell) */}
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        <div className="flex flex-1 relative w-full min-h-0">
-          {/* Left Sidebar */}
-          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        {/* Center/Right Main Workspace Area */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Top Navbar */}
+          <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
-          {/* Center Main Content Area */}
           <div className="flex-1 p-4 sm:p-6 lg:p-7 pb-24 lg:pb-7 w-full min-w-0 transition-all flex flex-col lg:flex-row gap-6">
             <main className="flex-1 min-w-0">
               <Outlet />
@@ -50,6 +50,7 @@ export const MainLayout = () => {
         </div>
 
       </div>
+
 
       {/* Floating Mobile Cart Button */}
       {isStudentPortal && totalItemsCount > 0 && (

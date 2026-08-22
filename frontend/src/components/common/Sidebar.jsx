@@ -12,6 +12,7 @@ import {
   BarChart3,
   CheckSquare,
   Flame,
+  Bell,
   LogOut,
   X
 } from 'lucide-react';
@@ -65,7 +66,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
             </div>
             <div>
               <h2 className="text-sm font-black text-white tracking-tight leading-tight">Smart Mess</h2>
-              <span className="text-[10px] font-extrabold text-[#8E8E93] uppercase tracking-wider block">{user?.role || 'PORTAL'}</span>
+              <span className="text-[10px] font-black text-[#FF3B30] uppercase tracking-widest block">{user?.role || 'PORTAL'}</span>
             </div>
           </div>
           {/* Mobile close button */}
@@ -88,7 +89,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
                 end={link.path === '/student' || link.path === '/chef' || link.path === '/admin'}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `group relative flex items-center gap-3.5 px-4 py-3 text-xs font-extrabold transition-all duration-200 rounded-2xl ${
+                  `group relative flex items-center gap-3.5 px-4 py-3 text-xs font-black transition-all duration-200 rounded-2xl ${
                     isActive
                       ? 'bg-[#272727] text-[#FF3B30] shadow-md border-l-4 border-[#FF3B30]'
                       : 'text-[#8E8E93] hover:text-white hover:bg-[#222222]'
@@ -112,7 +113,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
       </div>
 
       {/* Bottom Circular Controls & Logout */}
-      <div className="pt-4 border-t border-[#2B2B2B] space-y-4">
+      <div className="pt-4 border-t border-[#262626]/50 space-y-4">
         <div className="flex items-center justify-around">
           <NavLink
             to={user?.role === 'STUDENT' ? '/student/settings' : '/admin/settings'}
@@ -121,6 +122,14 @@ export const Sidebar = ({ isOpen, onClose }) => {
           >
             <Settings className="w-4.5 h-4.5" />
           </NavLink>
+
+          <button
+            type="button"
+            className="w-10 h-10 rounded-full bg-[#272727] hover:bg-[#FF3B30] text-[#8E8E93] hover:text-white flex items-center justify-center transition-all duration-200 shadow-md border border-[#333333]"
+            title="Notifications"
+          >
+            <Bell className="w-4.5 h-4.5" />
+          </button>
 
           <button
             type="button"
@@ -138,7 +147,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
   return (
     <>
       {/* Desktop In-Shell Sidebar */}
-      <aside className="hidden lg:flex w-60 shrink-0 bg-[#1A1A1A] border-r border-[#2B2B2B] flex-col justify-between self-stretch">
+      <aside className="hidden lg:flex w-60 shrink-0 bg-[#1A1A1A] border-r border-[#262626] flex-col justify-between self-stretch">
         {sidebarContent}
       </aside>
 
@@ -151,7 +160,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
       )}
 
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-[#1A1A1A] border-r border-[#2B2B2B] flex flex-col justify-between transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-[#1A1A1A] border-r border-[#262626] flex flex-col justify-between transition-transform duration-300 ease-in-out lg:hidden ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -160,6 +169,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     </>
   );
 };
+
 
 
 

@@ -22,7 +22,7 @@ export const Navbar = ({ onToggleSidebar }) => {
         >
           <Menu className="w-5 h-5" />
         </button>
-        <div className="flex items-center gap-2.5 font-black text-lg tracking-tight">
+        <div className="lg:hidden flex items-center gap-2.5 font-black text-lg tracking-tight">
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#FF3B30] to-[#FF6B60] text-white flex items-center justify-center shadow-md shadow-[#FF3B30]/30">
             <Flame className="w-5 h-5 fill-white" />
           </div>
@@ -30,7 +30,11 @@ export const Navbar = ({ onToggleSidebar }) => {
             Smart <span className="text-[#FF3B30]">Mess</span>
           </span>
         </div>
+        <div className="hidden lg:block text-xs font-black text-[#8E8E93] tracking-wider uppercase">
+          Welcome back, <span className="text-white">{user?.name || 'Student'}</span> 👋
+        </div>
       </div>
+
 
       {/* Right: Actions */}
       <div className="flex items-center gap-3">
