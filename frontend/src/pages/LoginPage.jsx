@@ -132,17 +132,21 @@ export const LoginPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 px-4 bg-[#1C1C1C] hover:bg-[#FF3B30] disabled:opacity-50 text-white font-black text-xs uppercase tracking-widest rounded-full transition-all duration-300 shadow-xl border border-[#333333] hover:border-[#FF3B30] flex items-center justify-center gap-2 mt-6"
+            className="w-full py-4 px-4 bg-[#FF3B30] hover:brightness-110 disabled:opacity-50 text-white font-black text-xs uppercase tracking-widest rounded-full transition-all duration-300 shadow-xl border border-[#FF3B30] flex items-center justify-center gap-2 mt-6"
           >
             {loading ? (
-              <LoadingSpinner size="sm" className="border-white border-t-transparent" />
+              <div className="flex items-center gap-2">
+                <LoadingSpinner size="sm" className="border-white border-t-transparent" />
+                <span>SIGNING IN (CONNECTING...)</span>
+              </div>
             ) : (
               <>
-                <span>SIGN IN</span>
+                <span>SIGN IN TO PORTAL</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
+
         </form>
 
         {/* Demo Credentials & Registration Link */}
