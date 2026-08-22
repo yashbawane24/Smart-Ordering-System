@@ -30,12 +30,12 @@ export const MainLayout = () => {
         {/* Top Navbar */}
         <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
 
-        <div className="flex flex-1 relative w-full">
-          {/* Left Sidebar Drawer */}
+        <div className="flex flex-1 relative w-full min-h-0">
+          {/* Left Sidebar */}
           <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
           {/* Center Main Content Area */}
-          <div className="flex-1 lg:ml-56 p-4 sm:p-6 lg:p-7 pb-24 lg:pb-7 w-full min-w-0 transition-all flex flex-col lg:flex-row gap-6">
+          <div className="flex-1 p-4 sm:p-6 lg:p-7 pb-24 lg:pb-7 w-full min-w-0 transition-all flex flex-col lg:flex-row gap-6">
             <main className="flex-1 min-w-0">
               <Outlet />
             </main>
@@ -48,6 +48,7 @@ export const MainLayout = () => {
             )}
           </div>
         </div>
+
       </div>
 
       {/* Floating Mobile Cart Button */}
