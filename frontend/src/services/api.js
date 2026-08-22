@@ -1,11 +1,12 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://smart-mess-backend-dt8o.onrender.com/api',
   headers: {
     'Content-Type': 'application/json'
   }
 });
+
 
 // Request Interceptor: Attach JWT Token
 api.interceptors.request.use(
