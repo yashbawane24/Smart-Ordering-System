@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans bg-[#050505] text-[#FFFFFF] antialiased selection:bg-[#E50914] selection:text-white;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #242424;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #E50914;
+}
+
+/* Background Red Subtle Mesh Pattern */
+.bg-mesh-pattern {
+  background-color: #050505;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(229, 9, 20, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(185, 28, 28, 0.08) 0px, transparent 50%);
+}
+
+/* Gradient Text for Red Highlights */
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#FF2D2D] via-[#E50914] to-[#B91C1C];
+}
+
+/* Input Focus Glow */
+.input-red-focus {
+  @apply focus:outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]/50 transition-all;
+}
+
+/* Card Red Hover Glow */
+.card-hover-red {
+  transition: all 0.3s ease;
+}
+.card-hover-red:hover {
+  border-color: #7F1D1D;
+  box-shadow: 0 0 15px -3px rgba(229, 9, 20, 0.15);
+}

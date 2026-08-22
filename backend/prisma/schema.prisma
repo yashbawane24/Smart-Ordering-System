@@ -1,0 +1,138 @@
+// Prisma Schema for Smart Digital Mess Ordering System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  name          String
+  phone         String?
+  role          String         @default("STUDENT") // STUDENT, CHEF, ADMIN
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  student       Student?
+  chef          Chef?
+  admin         Admin?
+  notifications Notification[]
+}
+
+model Student {
+  id           String         @id @default(uuid())
+  userId       String         @unique
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentIdStr String         @unique // e.g., 21BCE1042
+  hostel       String?        // e.g., Block A, Mens Hostel
+  roomNumber   String?        // e.g., 302
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  creditAccount CreditAccount?
+  orders        Order[]
+}
+
+model Chef {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chefIdStr String   @unique // e.g., CHEF001
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Admin {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  adminIdStr String   @unique // e.g., ADM001
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model CreditAccount {
+  id              String              @id @default(uuid())
+  studentId       String              @unique
+  student         Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  monthlyCredit   Float               @default(9000.0)
+  usedCredit      Float               @default(0.0)
+  remainingCredit Float               @default(9000.0)
+  monthYear       String              // e.g. "2026-08"
+  updatedAt       DateTime            @updatedAt
+
+  transactions    CreditTransaction[]
+}
+
+model CreditTransaction {
+  id              String        @id @default(uuid())
+  creditAccountId String
+  creditAccount   CreditAccount @relation(fields: [creditAccountId], references: [id], onDelete: Cascade)
+  type            String        // MONTHLY_ALLOCATION, ORDER_PAYMENT, REFUND, ADMIN_ADJUSTMENT
+  amount          Float         // Positive for credit, negative for payment
+  balanceAfter    Float
+  description     String
+  orderId         String?
+  order           Order?        @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  createdAt       DateTime      @default(now())
+}
+
+model MenuItem {
+  id                String      @id @default(uuid())
+  name              String
+  description       String
+  category          String      // Breakfast, Lunch, Dinner, Beverages, Snacks
+  price             Float
+  availableQuantity Int         @default(100)
+  imageUrl          String
+  isAvailable       Boolean     @default(true)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  orderItems        OrderItem[]
+}
+
+model Order {
+  id                 String              @id @default(uuid())
+  orderNumber        String              @unique // e.g., ORD-20260823-1001
+  studentId          String
+  student            Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  totalCredits       Float
+  status             String              @default("PENDING") // PENDING, ACCEPTED, PREPARING, READY, COMPLETED, CANCELLED
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  orderItems         OrderItem[]
+  creditTransactions CreditTransaction[]
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItemId String
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Restrict)
+  itemName   String
+  itemPrice  Float
+  quantity   Int
+  subtotal   Float
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String   @default("INFO") // ORDER_UPDATE, REFUND, CREDIT_ALERT, GENERAL
+  createdAt DateTime @default(now())
+}
