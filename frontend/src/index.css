@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply font-sans bg-[#080808] text-[#FFFFFF] antialiased selection:bg-[#E50914] selection:text-white min-h-screen overflow-x-hidden;
+    @apply font-sans bg-[#121112] text-[#FFFFFF] antialiased selection:bg-[#FF3B30] selection:text-white min-h-screen overflow-x-hidden;
   }
 }
 
@@ -15,16 +15,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #080808;
+  background: #161616;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #222222;
+  background: #2D2D2D;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #E50914;
+  background: #FF3B30;
 }
 
 /* Hide Scrollbar for Horizontal Chips */
@@ -36,50 +36,71 @@
   scrollbar-width: none;
 }
 
-/* Premium Dark Ambient Red Glow Background */
-.bg-ambient-glow {
-  background-color: #080808;
+/* Outer Canvas Ambient Red Glow (matching reference image wrapper background) */
+.bg-reference-outer {
+  background-color: #121011;
   background-image: 
-    radial-gradient(circle at 15% 15%, rgba(229, 9, 20, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(185, 28, 28, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 50% 0%, rgba(255, 43, 43, 0.05) 0%, transparent 40%);
+    radial-gradient(circle at 90% 10%, rgba(139, 28, 28, 0.35) 0%, transparent 55%),
+    radial-gradient(circle at 10% 90%, rgba(40, 20, 25, 0.5) 0%, transparent 60%);
 }
 
-/* Glassmorphism Card Style */
-.glass-card {
-  background: rgba(23, 23, 23, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+/* Reference Dark Dashboard Shell Container */
+.dashboard-shell {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
 }
 
-.glass-card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Left Sidebar Curved Active Tab Background */
+.sidebar-active-tab {
+  background-color: #272727;
+  color: #FF3B30;
+  border-radius: 20px 0px 0px 20px;
+  position: relative;
 }
 
-.glass-card-hover:hover {
-  background: rgba(28, 28, 28, 0.85);
-  border-color: rgba(229, 9, 20, 0.4);
-  box-shadow: 0 8px 25px -5px rgba(229, 9, 20, 0.15);
-  transform: translateY(-2px);
+/* Pop-out 3D Food Image Shadow & Hover Float */
+.food-popout-img {
+  filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.65));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Gradient Text for Red Highlights */
-.gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#FF2B2B] via-[#E50914] to-[#B91C1C];
+.group:hover .food-popout-img {
+  transform: translateY(-8px) scale(1.08);
 }
 
-/* Input Focus Glow */
-.input-red-focus {
-  @apply focus:outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]/50 transition-all duration-200;
+/* Ticket Semicircle Notch Sockets for Cart Panel */
+.ticket-notch-left {
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #1a1a1a;
 }
 
-/* Red Button Pulse Shadow */
-.btn-red-glow {
-  box-shadow: 0 4px 20px -2px rgba(229, 9, 20, 0.4);
+.ticket-notch-right {
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #1a1a1a;
 }
 
-.btn-red-glow:hover {
-  box-shadow: 0 6px 25px 0px rgba(229, 9, 20, 0.6);
+/* Red Active Pill Gradient */
+.btn-red-pill {
+  background: linear-gradient(135deg, #FF3B30 0%, #D32F2F 100%);
+  box-shadow: 0 6px 20px rgba(255, 59, 48, 0.35);
 }
+
+.btn-red-pill:hover {
+  background: linear-gradient(135deg, #FF5247 0%, #E53935 100%);
+  box-shadow: 0 8px 25px rgba(255, 59, 48, 0.5);
+}
+
 
