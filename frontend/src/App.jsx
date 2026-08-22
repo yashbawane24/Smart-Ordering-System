@@ -9,7 +9,9 @@ import { MainLayout } from './layouts/MainLayout';
 // Public Pages
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+
 
 // Student Pages
 import { StudentDashboardPage } from './pages/student/StudentDashboardPage';
@@ -71,7 +73,9 @@ export const App = () => {
       <Route element={<LandingLayout />}>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<SignupPage />} />
       </Route>
+
 
       {/* Protected Student Portal */}
       <Route

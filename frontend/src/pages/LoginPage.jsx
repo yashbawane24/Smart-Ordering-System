@@ -145,17 +145,26 @@ export const LoginPage = () => {
           </button>
         </form>
 
-        {/* Demo Credentials Quick Fill Box */}
-        <div className="mt-8 pt-6 border-t border-[#2D2D2D] text-center">
-          <span className="text-[11px] text-[#8E8E93] block mb-2 font-bold uppercase tracking-wider">Quick Demo Credentials</span>
-          <div className="p-3 bg-[#141414] rounded-2xl border border-[#2D2D2D] text-xs font-mono text-[#FF3B30] space-y-0.5">
-            <p>Email: <span className="text-white font-bold">{email}</span></p>
-            <p>Password: <span className="text-white font-bold">Password123</span></p>
+        {/* Demo Credentials & Registration Link */}
+        <div className="mt-8 pt-6 border-t border-[#2D2D2D] text-center space-y-4">
+          <p className="text-xs font-bold text-[#8E8E93]">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-[#FF3B30] hover:underline font-black">
+              Register Here →
+            </Link>
+          </p>
+          <div>
+            <span className="text-[10px] text-[#8E8E93] block mb-1 font-extrabold uppercase tracking-wider">Quick Demo Credentials</span>
+            <div className="p-3 bg-[#141414] rounded-2xl border border-[#2D2D2D] text-xs font-mono text-[#FF3B30] space-y-0.5">
+              <p>Email: <span className="text-white font-bold">{email}</span></p>
+              <p>Password: <span className="text-white font-bold">Password123</span></p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
 
 

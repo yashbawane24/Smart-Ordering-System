@@ -3,6 +3,111 @@ import bcrypt from 'bcryptjs';
 import { generateToken } from '../utils/jwt.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
+export const register = async (req, res, next) => {
+  try {
+    const { name, email, password, phone, role = 'STUDENT', studentIdStr, hostel, roomNumber } = req.body;
+
+    if (!name || !email || !password) {
+      return errorResponse(res, 400, 'Name, email, and password are required');
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Check existing email
+    const existingUser = await prisma.user.findUnique({
+      where: { email: cleanEmail }
+    });
+
+    if (existingUser) {
+      return errorResponse(res, 400, 'An account with this email address already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const userRole = ['STUDENT', 'CHEF', 'ADMIN'].includes(role) ? role : 'STUDENT';
+
+    // Create user record inside transaction
+    const newUser = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: {
+          name,
+          email: cleanEmail,
+          password: hashedPassword,
+          phone: phone || null,
+          role: userRole
+        }
+      });
+
+      if (userRole === 'STUDENT') {
+        const studentRegId = studentIdStr || `REG-${Math.floor(10000 + Math.random() * 90000)}`;
+        const studentRecord = await tx.student.create({
+          data: {
+            userId: createdUser.id,
+            studentIdStr: studentRegId,
+            hostel: hostel || 'Block A, Mens Hostel',
+            roomNumber: roomNumber || 'A-101',
+            isActive: true
+          }
+        });
+
+        // Auto-provision initial 9,000 monthly credits wallet for student
+        const creditAcc = await tx.creditAccount.create({
+          data: {
+            studentId: studentRecord.id,
+            monthlyCredit: 9000,
+            usedCredit: 0,
+            remainingCredit: 9000,
+            monthYear: new Date().toISOString().slice(0, 7)
+          }
+        });
+
+        // Log initial credit allocation transaction
+        await tx.creditTransaction.create({
+          data: {
+            creditAccountId: creditAcc.id,
+            type: 'MONTHLY_ALLOCATION',
+            amount: 9000,
+            balanceAfter: 9000,
+            description: 'Initial Registration 9,000 Monthly Credit Allowance'
+          }
+        });
+      } else if (userRole === 'CHEF') {
+        await tx.chef.create({
+          data: {
+            userId: createdUser.id,
+            kitchenSection: 'Main Kitchen Counter',
+            isActive: true
+          }
+        });
+      } else if (userRole === 'ADMIN') {
+        await tx.admin.create({
+          data: {
+            userId: createdUser.id,
+            permissions: 'FULL'
+          }
+        });
+      }
+
+      return tx.user.findUnique({
+        where: { id: createdUser.id },
+        include: {
+          student: { include: { creditAccount: true } },
+          chef: true,
+          admin: true
+        }
+      });
+    });
+
+    const token = generateToken(newUser);
+    const { password: _, ...userData } = newUser;
+
+    return successResponse(res, 201, 'Account created successfully', {
+      token,
+      user: userData
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const login = async (req, res, next) => {
   try {
@@ -76,3 +181,4 @@ export const getCurrentUser = async (req, res, next) => {
 export const logout = async (req, res) => {
   return successResponse(res, 200, 'Logout successful');
 };
+

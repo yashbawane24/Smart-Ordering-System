@@ -58,11 +58,23 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (formData) => {
+
+    const res = await api.post('/auth/register', formData);
+    if (res.success) {
+      localStorage.setItem('smart_mess_token', res.data.token);
+      localStorage.setItem('smart_mess_user', JSON.stringify(res.data.user));
+      setUser(res.data.user);
+      return res;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, refreshUser, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, refreshUser, loading }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => useContext(AuthContext);

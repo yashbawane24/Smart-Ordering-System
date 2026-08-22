@@ -48,10 +48,10 @@ export const LandingPage = () => {
             Sign In
           </Link>
           <Link
-            to="/login"
+            to="/register"
             className="btn-red-pill px-6 py-3 text-xs font-black uppercase tracking-wider text-white flex items-center gap-2"
           >
-            <span>Get Started</span>
+            <span>Register Account</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
@@ -67,7 +67,7 @@ export const LandingPage = () => {
           transition={{ duration: 0.5 }}
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#272727] border border-[#333333] text-[#FF3B30] text-xs font-black tracking-widest uppercase mb-8 shadow-xl"
         >
-          <Sparkles className="w-4 h-4 text-[#FF3B30]" /> NEXT-GEN COLLEGE MESS SAAS
+          <Sparkles className="w-4 h-4 text-[#FF3B30]" /> OFFICIAL MESS SYSTEM & CREDIT PORTAL
         </motion.div>
 
         {/* Headline */}
@@ -77,7 +77,7 @@ export const LandingPage = () => {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight max-w-5xl mx-auto leading-tight text-white"
         >
-          Smart Ordering. <br />
+          Official Digital Mess. <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF3B30] via-[#FF6B60] to-[#E50914]">
             Zero Token Queue.
           </span>
@@ -90,7 +90,7 @@ export const LandingPage = () => {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mt-6 text-base sm:text-lg text-[#8E8E93] max-w-2xl mx-auto font-medium leading-relaxed"
         >
-          Experience college mess dining reimagined. Real-time menu stock tracking, 9,000 monthly student credits, and live kitchen status updates.
+          Official campus mess dining platform. Real-time menu stock tracking, automatic 9,000 monthly student credits, and live kitchen order progression.
         </motion.p>
 
         {/* CTAs */}
@@ -101,19 +101,20 @@ export const LandingPage = () => {
           className="mt-8 flex flex-wrap justify-center gap-4"
         >
           <Link
-            to="/login"
+            to="/register"
             className="btn-red-pill px-8 py-4 text-xs font-black uppercase tracking-widest text-white flex items-center gap-3 shadow-2xl"
           >
-            <span>LAUNCH STUDENT DEMO</span>
+            <span>REGISTER OFFICIAL ACCOUNT</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <a
-            href="#demo-roles"
+          <Link
+            to="/login"
             className="px-8 py-4 text-xs font-black uppercase tracking-widest bg-[#222222] hover:bg-[#2A2A2A] text-white rounded-full border border-[#333333] transition"
           >
-            Explore Role Portals
-          </a>
+            Sign In To Portal
+          </Link>
         </motion.div>
+
 
         {/* Interactive Dashboard Shell Preview (Matches Reference UI Design) */}
         <motion.div
