@@ -17,9 +17,13 @@ const app = express();
 
 // Middlewares
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
+  origin: (origin, callback) => {
+    // Dynamically mirror origin to allow credentials for Vercel and local origins
+    callback(null, origin || true);
+  },
   credentials: true
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
