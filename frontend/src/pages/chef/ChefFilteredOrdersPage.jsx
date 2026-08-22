@@ -43,10 +43,10 @@ export const ChefFilteredOrdersPage = ({ targetStatus, title, description }) => 
   if (loading) return <SkeletonLoader count={3} type="card" />;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-[1250px] mx-auto pb-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100">{title}</h1>
-        <p className="text-xs sm:text-sm text-slate-400">{description}</p>
+        <h1 className="text-2xl font-black text-white tracking-tight">{title}</h1>
+        <p className="text-xs font-bold text-[#FF3B30]">{description}</p>
       </div>
 
       {orders.length > 0 ? (
@@ -61,3 +61,4 @@ export const ChefFilteredOrdersPage = ({ targetStatus, title, description }) => 
     </div>
   );
 };
+

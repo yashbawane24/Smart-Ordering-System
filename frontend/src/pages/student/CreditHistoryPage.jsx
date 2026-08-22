@@ -38,7 +38,7 @@ export const CreditHistoryPage = () => {
     {
       header: 'Transaction ID',
       accessor: 'id',
-      cell: (row) => <span className="font-mono text-xs font-bold text-[#737373]">#{row.id.slice(0, 8)}</span>
+      cell: (row) => <span className="font-mono text-xs font-black text-white">#{row.id.slice(0, 8)}</span>
     },
     {
       header: 'Type',
@@ -46,10 +46,10 @@ export const CreditHistoryPage = () => {
       cell: (row) => {
         const isCredit = row.amount > 0;
         return (
-          <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-full border ${
+          <span className={`inline-flex items-center gap-1 px-3 py-1 text-[11px] font-extrabold rounded-full text-white shadow-md ${
             isCredit
-              ? 'bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20'
-              : 'bg-[#450A0A] text-[#FF2D2D] border-[#7F1D1D]'
+              ? 'bg-[#22C55E]'
+              : 'bg-[#FF3B30]'
           }`}>
             {isCredit ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
             {row.type.replace('_', ' ')}
@@ -60,13 +60,13 @@ export const CreditHistoryPage = () => {
     {
       header: 'Description',
       accessor: 'description',
-      cell: (row) => <span className="text-xs font-medium text-white">{row.description}</span>
+      cell: (row) => <span className="text-xs font-bold text-white">{row.description}</span>
     },
     {
       header: 'Amount',
       accessor: 'amount',
       cell: (row) => (
-        <span className={`font-extrabold ${row.amount > 0 ? 'text-[#22C55E]' : 'text-[#FF2D2D]'}`}>
+        <span className={`font-black font-mono ${row.amount > 0 ? 'text-[#22C55E]' : 'text-[#FF3B30]'}`}>
           {row.amount > 0 ? `+${formatCredits(row.amount)}` : formatCredits(row.amount)}
         </span>
       )
@@ -74,23 +74,23 @@ export const CreditHistoryPage = () => {
     {
       header: 'Balance After',
       accessor: 'balanceAfter',
-      cell: (row) => <span className="font-mono text-xs font-bold text-[#A3A3A3]">{formatCredits(row.balanceAfter)}</span>
+      cell: (row) => <span className="font-mono text-xs font-black text-[#8E8E93]">{formatCredits(row.balanceAfter)}</span>
     },
     {
       header: 'Date',
       accessor: 'createdAt',
-      cell: (row) => <span className="text-xs text-[#737373]">{formatDate(row.createdAt)}</span>
+      cell: (row) => <span className="text-xs text-[#8E8E93] font-medium">{formatDate(row.createdAt)}</span>
     }
   ];
 
   if (loading) return <SkeletonLoader count={4} type="card" />;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-[1250px] mx-auto pb-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Credit Wallet & Ledger</h1>
-        <p className="text-xs sm:text-sm text-[#A3A3A3]">Track monthly credit allocations, order debits, refunds, and balance resets.</p>
+        <h1 className="text-2xl font-black text-white tracking-tight">Credit Wallet & Ledger</h1>
+        <p className="text-xs font-bold text-[#FF3B30]">Monthly credit allocations, meal debits, and transaction logs.</p>
       </div>
 
       {/* Credit Card & Summary Section */}
@@ -103,23 +103,23 @@ export const CreditHistoryPage = () => {
           monthlyCredits={wallet?.monthlyCredit || 9000}
         />
 
-        <div className="bg-[#111111] border border-[#242424] rounded-3xl p-6 shadow-sm space-y-6">
-          <h3 className="font-bold text-white text-lg">Monthly Credit Rules</h3>
+        <div className="bg-[#222222] border border-[#2D2D2D] rounded-[24px] p-6 shadow-xl space-y-4">
+          <h3 className="font-black text-white text-base tracking-tight">Monthly Credit Rules</h3>
 
           <div className="space-y-3 text-xs">
-            <div className="flex items-center gap-3 p-3 bg-[#0A0A0A] rounded-xl border border-[#1C1C1C]">
-              <RefreshCw className="w-5 h-5 text-[#E50914] flex-shrink-0" />
+            <div className="flex items-center gap-3 p-3.5 bg-[#1A1A1A] rounded-2xl border border-[#2D2D2D]">
+              <RefreshCw className="w-5 h-5 text-[#FF3B30] shrink-0" />
               <div>
-                <h4 className="font-bold text-white">Automatic Reset</h4>
-                <p className="text-[#A3A3A3]">Every 1st of the month, 9,000 fresh credits are allocated to your wallet.</p>
+                <h4 className="font-extrabold text-white">Automatic 9,000 Credit Reset</h4>
+                <p className="text-[#8E8E93]">Every 1st of the month, 9,000 fresh credits are allocated to your wallet.</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 bg-[#0A0A0A] rounded-xl border border-[#1C1C1C]">
-              <AlertCircle className="w-5 h-5 text-[#FF2D2D] flex-shrink-0" />
+            <div className="flex items-center gap-3 p-3.5 bg-[#1A1A1A] rounded-2xl border border-[#2D2D2D]">
+              <AlertCircle className="w-5 h-5 text-[#FF3B30] shrink-0" />
               <div>
-                <h4 className="font-bold text-white">Instant Order Refunds</h4>
-                <p className="text-[#A3A3A3]">Cancelling a pending order instantly restores credits to your account.</p>
+                <h4 className="font-extrabold text-white">Instant Credit Refund</h4>
+                <p className="text-[#8E8E93]">Cancelling a pending order immediately restores credits to your balance.</p>
               </div>
             </div>
           </div>
@@ -127,10 +127,13 @@ export const CreditHistoryPage = () => {
       </div>
 
       {/* Transaction Ledger Table */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-extrabold text-white">Transaction History</h2>
-        <DataTable columns={columns} data={transactions} searchPlaceholder="Search description or type..." pageSize={10} />
+      <div className="space-y-3 pt-2">
+        <h2 className="text-base font-black text-white tracking-tight">Transaction History</h2>
+        <div className="bg-[#222222] border border-[#2D2D2D] rounded-[24px] p-4 shadow-2xl overflow-hidden">
+          <DataTable columns={columns} data={transactions} searchPlaceholder="Search description or type..." pageSize={10} />
+        </div>
       </div>
     </div>
   );
 };
+

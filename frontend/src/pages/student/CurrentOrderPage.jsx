@@ -45,17 +45,17 @@ export const CurrentOrderPage = () => {
   const activeOrders = orders.filter(o => ['PENDING', 'ACCEPTED', 'PREPARING', 'READY'].includes(o.status));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-[1250px] mx-auto pb-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Live Order Tracking</h1>
-          <p className="text-xs sm:text-sm text-[#A3A3A3]">Track kitchen preparation progress and pickup alerts in real time.</p>
+          <h1 className="text-2xl font-black text-white tracking-tight">Live Order Tracking</h1>
+          <p className="text-xs font-bold text-[#FF3B30]">Real-time kitchen preparation status & progress alerts.</p>
         </div>
         <button
           onClick={fetchOrders}
-          className="p-2 text-xs font-semibold text-[#FF2D2D] hover:bg-[#450A0A] rounded-lg transition flex items-center gap-1.5 border border-[#7F1D1D]"
+          className="px-4 py-2 text-xs font-extrabold bg-[#222222] hover:bg-[#FF3B30] text-white rounded-full transition border border-[#333333] hover:border-[#FF3B30] flex items-center gap-1.5 shadow-lg"
         >
-          <RefreshCw className="w-4 h-4" /> Refresh
+          <RefreshCw className="w-3.5 h-3.5" /> Refresh Status
         </button>
       </div>
 
@@ -70,7 +70,7 @@ export const CurrentOrderPage = () => {
       ) : (
         <EmptyState
           title="No Active Orders"
-          message="You don't have any orders currently being prepared by the kitchen."
+          message="You don't have any orders currently being prepared by the mess kitchen."
           icon={Clock}
           actionLabel="Place an Order"
           onAction={() => navigate('/student/menu')}
@@ -79,3 +79,4 @@ export const CurrentOrderPage = () => {
     </div>
   );
 };
+

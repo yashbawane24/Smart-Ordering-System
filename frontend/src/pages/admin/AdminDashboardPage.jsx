@@ -30,11 +30,11 @@ export const AdminDashboardPage = () => {
   if (loading) return <SkeletonLoader count={4} type="card" />;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-[1250px] mx-auto pb-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Admin Control Center</h1>
-        <p className="text-xs sm:text-sm text-[#A3A3A3]">Overview of student registrations, kitchen staff, daily orders, and processed credits.</p>
+        <h1 className="text-2xl font-black text-white tracking-tight">Admin Control Center</h1>
+        <p className="text-xs font-bold text-[#FF3B30]">Overview of student registrations, kitchen staff, daily orders, and processed credits.</p>
       </div>
 
       {/* Analytics Cards */}
@@ -72,10 +72,11 @@ export const AdminDashboardPage = () => {
 const QuickCard = ({ title, description, link }) => (
   <Link
     to={link}
-    className="bg-[#111111] border border-[#242424] hover:border-[#7F1D1D] rounded-2xl p-6 shadow-sm hover:shadow-red-subtle transition-all duration-300 group space-y-2"
+    className="bg-[#222222] border border-[#2D2D2D] hover:border-[#FF3B30] rounded-[24px] p-6 shadow-xl transition-all duration-300 group space-y-2"
   >
-    <h3 className="text-lg font-bold text-white group-hover:text-[#FF2D2D] transition">{title}</h3>
-    <p className="text-xs text-[#A3A3A3] leading-relaxed">{description}</p>
-    <span className="text-xs font-bold text-[#E50914] pt-2 block">Open Module →</span>
+    <h3 className="text-base font-black text-white group-hover:text-[#FF3B30] transition">{title}</h3>
+    <p className="text-xs text-[#8E8E93] leading-relaxed">{description}</p>
+    <span className="text-xs font-bold text-[#FF3B30] pt-2 block">Open Module →</span>
   </Link>
 );
+

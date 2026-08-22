@@ -1,285 +1,333 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  UtensilsCrossed,
+  Flame,
   ArrowRight,
   Shield,
   CreditCard,
   Clock,
   ChefHat,
   Smartphone,
-  BarChart,
+  BarChart3,
   CheckCircle2,
-  Github
+  Sparkles,
+  Search,
+  Star,
+  ShoppingBag,
+  Utensils
 } from 'lucide-react';
 
 export const LandingPage = () => {
-  return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-[#E50914] selection:text-white overflow-hidden">
-      {/* Background Red Mesh Gradient */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-tr from-[#E50914]/15 via-[#B91C1C]/10 to-transparent blur-3xl rounded-full pointer-events-none" />
+  const navigate = useNavigate();
 
-      {/* Navbar */}
-      <nav className="relative z-10 max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+  return (
+    <div className="min-h-screen bg-reference-outer text-white selection:bg-[#FF3B30] selection:text-white overflow-hidden font-sans">
+      
+      {/* Top Stylish Navbar */}
+      <nav className="relative z-20 max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#E50914] text-white flex items-center justify-center shadow-lg shadow-[#E50914]/30">
-            <UtensilsCrossed className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#FF3B30] to-[#FF6B60] text-white flex items-center justify-center shadow-lg shadow-[#FF3B30]/40">
+            <Flame className="w-6 h-6 fill-white" />
           </div>
-          <span className="font-extrabold text-xl tracking-tight text-white">
-            Smart <span className="text-[#E50914]">Mess</span>
-          </span>
+          <div>
+            <span className="font-black text-xl tracking-tight text-white block">
+              Smart <span className="text-[#FF3B30]">Mess</span>
+            </span>
+            <span className="text-[10px] text-[#8E8E93] font-bold block uppercase tracking-widest">
+              Digital Ordering & Credits
+            </span>
+          </div>
         </div>
+
         <div className="flex items-center gap-4">
           <Link
             to="/login"
-            className="px-5 py-2.5 text-xs font-semibold text-[#A3A3A3] hover:text-white transition"
+            className="px-5 py-2.5 text-xs font-extrabold text-[#8E8E93] hover:text-white transition"
           >
             Sign In
           </Link>
           <Link
             to="/login"
-            className="px-5 py-2.5 text-xs font-bold bg-[#E50914] hover:bg-[#FF2D2D] text-white rounded-lg transition shadow-lg shadow-[#E50914]/25 flex items-center gap-2"
+            className="btn-red-pill px-6 py-3 text-xs font-black uppercase tracking-wider text-white flex items-center gap-2"
           >
-            GET STARTED <ArrowRight className="w-4 h-4" />
+            <span>Get Started</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-16 pb-24 text-center">
+      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-10 pb-20 text-center">
+        
+        {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#450A0A] border border-[#7F1D1D] text-[#FF2D2D] text-xs font-bold uppercase tracking-wider mb-6"
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#272727] border border-[#333333] text-[#FF3B30] text-xs font-black tracking-widest uppercase mb-8 shadow-xl"
         >
-          <Sparkles className="w-4 h-4" /> Next-Gen College Mess SaaS Platform
+          <Sparkles className="w-4 h-4 text-[#FF3B30]" /> NEXT-GEN COLLEGE MESS SAAS
         </motion.div>
 
+        {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight max-w-4xl mx-auto leading-tight text-white"
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight max-w-5xl mx-auto leading-tight text-white"
         >
           Smart Ordering. <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF2D2D] via-[#E50914] to-[#B91C1C]">
-            Less Waiting.
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF3B30] via-[#FF6B60] to-[#E50914]">
+            Zero Token Queue.
           </span>
         </motion.h1>
 
+        {/* Subtext */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-6 text-base sm:text-lg text-[#A3A3A3] max-w-2xl mx-auto font-medium leading-relaxed"
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-6 text-base sm:text-lg text-[#8E8E93] max-w-2xl mx-auto font-medium leading-relaxed"
         >
-          Digitize your college mess ordering experience with real-time menu availability, monthly credit management, and instant kitchen order tracking.
+          Experience college mess dining reimagined. Real-time menu stock tracking, 9,000 monthly student credits, and live kitchen status updates.
         </motion.p>
 
+        {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-10 flex flex-wrap justify-center gap-4"
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-8 flex flex-wrap justify-center gap-4"
         >
           <Link
             to="/login"
-            className="px-8 py-3.5 text-sm font-extrabold bg-[#E50914] hover:bg-[#FF2D2D] text-white rounded-lg transition shadow-xl shadow-[#E50914]/25 flex items-center gap-3"
+            className="btn-red-pill px-8 py-4 text-xs font-black uppercase tracking-widest text-white flex items-center gap-3 shadow-2xl"
           >
-            GET STARTED <ArrowRight className="w-4 h-4" />
+            <span>LAUNCH STUDENT DEMO</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link
-            to="/login"
-            className="px-8 py-3.5 text-sm font-bold bg-[#111111] border border-[#242424] hover:border-[#7F1D1D] text-white rounded-lg transition"
+          <a
+            href="#demo-roles"
+            className="px-8 py-4 text-xs font-black uppercase tracking-widest bg-[#222222] hover:bg-[#2A2A2A] text-white rounded-full border border-[#333333] transition"
           >
-            LOGIN
-          </Link>
+            Explore Role Portals
+          </a>
         </motion.div>
 
-        {/* Hero Features Graphic */}
+        {/* Interactive Dashboard Shell Preview (Matches Reference UI Design) */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-16 max-w-5xl mx-auto bg-[#111111] border border-[#242424] rounded-2xl p-6 sm:p-10 shadow-2xl relative overflow-hidden group"
+          className="mt-14 max-w-5xl mx-auto bg-[#1A1A1A] border border-[#2B2B2B] rounded-[36px] p-6 sm:p-8 shadow-2xl relative overflow-hidden text-left"
         >
-          <div className="absolute inset-0 bg-gradient-to-tr from-[#E50914]/10 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition duration-700" />
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-            <div className="p-6 bg-[#0A0A0A] border border-[#1C1C1C] rounded-xl space-y-2">
-              <div className="w-10 h-10 rounded-lg bg-[#450A0A] border border-[#7F1D1D] text-[#FF2D2D] flex items-center justify-center font-bold">
-                💳
-              </div>
-              <h3 className="font-bold text-white text-base">9,000 Monthly Credits</h3>
-              <p className="text-xs text-[#A3A3A3]">Automated credit reset each month. Seamless digital token-free wallet.</p>
+          {/* Top Bar Mock */}
+          <div className="flex items-center justify-between pb-6 border-b border-[#2D2D2D]">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#FF3B30]" />
+              <div className="w-3 h-3 rounded-full bg-[#FFCC00]" />
+              <div className="w-3 h-3 rounded-full bg-[#22C55E]" />
             </div>
-            <div className="p-6 bg-[#0A0A0A] border border-[#1C1C1C] rounded-xl space-y-2">
-              <div className="w-10 h-10 rounded-lg bg-[#450A0A] border border-[#7F1D1D] text-[#FF2D2D] flex items-center justify-center font-bold">
-                ⚡
-              </div>
-              <h3 className="font-bold text-white text-base">Atomic Orders</h3>
-              <p className="text-xs text-[#A3A3A3]">Single database transaction safety. Instant credit deduction & refunding.</p>
+            <div className="text-xs font-extrabold text-[#8E8E93] font-mono">
+              smart-mess-dashboard.app
             </div>
-            <div className="p-6 bg-[#0A0A0A] border border-[#1C1C1C] rounded-xl space-y-2">
-              <div className="w-10 h-10 rounded-lg bg-[#450A0A] border border-[#7F1D1D] text-[#FF2D2D] flex items-center justify-center font-bold">
-                👨‍🍳
+          </div>
+
+          {/* Grid Preview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+            
+            {/* Pop-Out Food Card Mock 1 */}
+            <div className="bg-[#222222] border border-[#2D2D2D] rounded-[24px] p-4 text-center relative mt-6 pt-10">
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full overflow-hidden shadow-xl border-2 border-[#333333]">
+                <img
+                  src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&auto=format&fit=crop&q=80"
+                  alt="Hamburger"
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <h3 className="font-bold text-white text-base">Kitchen Display</h3>
-              <p className="text-xs text-[#A3A3A3]">Real-time status updates: Pending → Accepted → Preparing → Ready.</p>
+              <h4 className="text-sm font-black text-white">Hamburger</h4>
+              <p className="text-[10px] text-[#8E8E93] font-bold">Starting From</p>
+              <div className="text-sm font-black text-white font-mono">$10.00</div>
+              <div className="flex items-center justify-between pt-2 mt-2 border-t border-[#2D2D2D] text-[10px] font-bold text-[#8E8E93]">
+                <div className="flex items-center gap-1 text-white">
+                  <Star className="w-3 h-3 text-[#FFCC00] fill-[#FFCC00]" />
+                  <span>4.8</span>
+                </div>
+                <span>1250 Sales</span>
+              </div>
             </div>
+
+            {/* Pop-Out Food Card Mock 2 */}
+            <div className="bg-[#222222] border border-[#2D2D2D] rounded-[24px] p-4 text-center relative mt-6 pt-10">
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full overflow-hidden shadow-xl border-2 border-[#333333]">
+                <img
+                  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop&q=80"
+                  alt="Pepperoni Pizza"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <h4 className="text-sm font-black text-white">Pepperoni Pizza</h4>
+              <p className="text-[10px] text-[#8E8E93] font-bold">Starting From</p>
+              <div className="text-sm font-black text-white font-mono">$15.50</div>
+              <div className="flex items-center justify-between pt-2 mt-2 border-t border-[#2D2D2D] text-[10px] font-bold text-[#8E8E93]">
+                <div className="flex items-center gap-1 text-white">
+                  <Star className="w-3 h-3 text-[#FFCC00] fill-[#FFCC00]" />
+                  <span>4.9</span>
+                </div>
+                <span>2100 Sales</span>
+              </div>
+            </div>
+
+            {/* Right Cart Mock */}
+            <div className="bg-[#222222] border border-[#2D2D2D] rounded-[24px] p-4 space-y-3">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-white flex items-center gap-1">
+                  <ShoppingBag className="w-3.5 h-3.5" /> Cart Preview
+                </span>
+                <span className="text-[#8E8E93]">ID: #1099</span>
+              </div>
+              <div className="grid grid-cols-3 gap-1 p-1 bg-[#1A1A1A] rounded-full border border-[#2D2D2D] text-[10px] text-center">
+                <div className="btn-red-pill py-1 text-white font-extrabold">Delivery</div>
+                <div className="py-1 text-[#8E8E93] font-bold">Dine in</div>
+                <div className="py-1 text-[#8E8E93] font-bold">Takeaway</div>
+              </div>
+              <div className="py-3 px-4 bg-[#1C1C1C] text-white text-[11px] font-black rounded-full text-center uppercase tracking-widest">
+                Confirm Order
+              </div>
+            </div>
+
           </div>
         </motion.div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-[#0A0A0A] border-y border-[#1F1F1F] relative">
+      {/* Feature Grid Section */}
+      <section className="py-20 bg-[#171717] border-y border-[#262626]">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#E50914]">System Features</h2>
-            <p className="text-3xl sm:text-4xl font-extrabold text-white mt-2">Built for Modern Campus Life</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <FeatureCard
-              icon={Smartphone}
-              title="Digital Food Ordering"
-              description="Browse categorization, check availability, search menu items, and place instant orders directly from your phone."
-            />
-            <FeatureCard
-              icon={CreditCard}
-              title="Monthly Credit Management"
-              description="Automatic allocation of 9,000 monthly credits per student with complete transaction ledger logs."
-            />
-            <FeatureCard
-              icon={Clock}
-              title="Real Time Menu"
-              description="Live stock tracking. When an item runs out, it automatically updates to Sold Out for all students."
-            />
-            <FeatureCard
-              icon={CheckCircle2}
-              title="Order Tracking"
-              description="Interactive 5-stage progress indicator keeping students notified from kitchen acceptance to pickup."
-            />
-            <FeatureCard
-              icon={ChefHat}
-              title="Chef Dashboard"
-              description="Dedicated kitchen display view allowing chefs to manage incoming orders and toggle item availability."
-            />
-            <FeatureCard
-              icon={BarChart}
-              title="Admin Management"
-              description="Full CRUD controls for Students, Chefs, and Menu items along with analytical reports and credit top-ups."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="py-24 max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-[#E50914]">Workflow</h2>
-          <p className="text-3xl sm:text-4xl font-extrabold text-white mt-2">How The System Works</p>
-        </div>
-
-        <div className="relative border-l-2 border-[#242424] md:border-l-0 md:flex justify-between items-start max-w-4xl mx-auto">
-          <TimelineStep step="1" title="Student Login" description="Sign in securely with student credentials." />
-          <TimelineStep step="2" title="View Menu" description="Explore breakfast, lunch, dinner & snacks." />
-          <TimelineStep step="3" title="Place Order" description="Select items & confirm shopping cart." />
-          <TimelineStep step="4" title="Credits Deducted" description="Atomic transaction deducts wallet balance." />
-          <TimelineStep step="5" title="Chef Receives" description="Kitchen accepts & begins preparation." />
-          <TimelineStep step="6" title="Food Ready" description="Pick up meal token-free at counter." />
-        </div>
-      </section>
-
-      {/* User Roles Section */}
-      <section className="py-24 bg-[#0A0A0A] border-t border-[#1F1F1F]">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-[#E50914]">Access Portals</h2>
-            <p className="text-3xl sm:text-4xl font-extrabold text-white mt-2">Tailored Role Experiences</p>
+          <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
+            <h2 className="text-xs font-black uppercase tracking-widest text-[#FF3B30]">POWERFUL FEATURES</h2>
+            <p className="text-3xl sm:text-4xl font-black text-white">Built Specifically for Mess Management</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <RoleCard
-              role="Student"
-              badge="STUDENT"
-              description="Order food token-free, monitor monthly credits, track order progress, and view transaction invoices."
-              email="student@vit.edu"
+            <FeatureCard
+              icon={CreditCard}
+              title="9,000 Monthly Credits"
+              description="Automatic balance reset every month. Students place orders without cash or physical tokens."
             />
-            <RoleCard
-              role="Chef"
-              badge="CHEF"
-              description="Manage live kitchen order queues, mark orders as accepted/preparing/ready, and update menu stock."
-              email="chef@vit.edu"
+            <FeatureCard
+              icon={Clock}
+              title="Real-Time Menu Stock"
+              description="Item counts automatically decrease as orders arrive. Out-of-stock items flag as Sold Out instantly."
             />
-            <RoleCard
-              role="Admin"
-              badge="ADMIN"
-              description="Oversee campus mess metrics, manage student & chef accounts, execute credit resets, and view analytics."
-              email="admin@vit.edu"
+            <FeatureCard
+              icon={ChefHat}
+              title="Chef Kitchen Display"
+              description="Kitchen staff accepts, prepares, and marks dishes ready with atomic status progression."
+            />
+            <FeatureCard
+              icon={CheckCircle2}
+              title="5-Stage Order Progress"
+              description="Students watch live order progress steps: Pending → Accepted → Preparing → Ready → Picked Up."
+            />
+            <FeatureCard
+              icon={Shield}
+              title="Role-Based Security"
+              description="JWT tokens, bcrypt passwords, and strict role guards protecting Student, Chef, and Admin routes."
+            />
+            <FeatureCard
+              icon={BarChart3}
+              title="Admin Analytics & Reports"
+              description="Full CRUD controls for users and menu items plus system revenue and order activity reporting."
             />
           </div>
+        </div>
+      </section>
+
+      {/* Interactive Role Portals Section */}
+      <section id="demo-roles" className="py-20 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
+          <h2 className="text-xs font-black uppercase tracking-widest text-[#FF3B30]">LIVE ACCESS PORTALS</h2>
+          <p className="text-3xl sm:text-4xl font-black text-white">Try Any Role Portal Instant Launch</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <RoleCard
+            title="Student Portal"
+            badge="STUDENT"
+            description="Browse today's menu, filter by category disk, add pop-out dishes to cart, and use monthly credit balance."
+            email="student@vit.edu"
+            onLaunch={() => navigate('/login')}
+          />
+          <RoleCard
+            title="Chef Kitchen Portal"
+            badge="CHEF"
+            description="Live kitchen order Kanban columns. Accept orders, mark items preparing, and toggle dish availability."
+            email="chef@vit.edu"
+            onLaunch={() => navigate('/login')}
+          />
+          <RoleCard
+            title="Admin Management"
+            badge="ADMIN"
+            description="Full mess administrative control. Manage students, chefs, menu prices, monthly credit top-ups, and sales."
+            email="admin@vit.edu"
+            onLaunch={() => navigate('/login')}
+          />
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[#1F1F1F] py-12 bg-[#050505] text-[#A3A3A3] text-xs">
+      <footer className="border-t border-[#262626] py-10 bg-[#121011] text-[#8E8E93] text-xs">
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div>
-            <div className="flex items-center gap-2 font-bold text-white text-base">
-              <UtensilsCrossed className="w-5 h-5 text-[#E50914]" /> Smart Mess System
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-full bg-[#FF3B30] text-white flex items-center justify-center">
+              <Flame className="w-4 h-4 fill-white" />
             </div>
-            <p className="mt-1">Production-ready College SaaS Project | Digital Mess & Credit Management</p>
+            <span className="font-extrabold text-white text-sm">Smart Mess Digital System</span>
           </div>
-          <div className="flex items-center gap-6 text-[#A3A3A3]">
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-white flex items-center gap-1">
-              <Github className="w-4 h-4" /> GitHub Repository
-            </a>
-            <span>VIT College Capstone Project</span>
-          </div>
+          <p className="text-center md:text-right text-[#8E8E93]">
+            VIT College Capstone Project | Production Ready SaaS Architecture
+          </p>
         </div>
       </footer>
+
     </div>
   );
 };
 
 const FeatureCard = ({ icon: Icon, title, description }) => (
-  <div className="p-6 bg-[#111111] border border-[#242424] hover:border-[#7F1D1D] rounded-2xl transition">
-    <div className="w-12 h-12 rounded-xl bg-[#450A0A] border border-[#7F1D1D] text-[#FF2D2D] flex items-center justify-center mb-4">
-      <Icon className="w-6 h-6" />
+  <div className="p-6 bg-[#222222] border border-[#2D2D2D] hover:border-[#FF3B30] rounded-[24px] transition duration-300 space-y-3 shadow-xl">
+    <div className="w-10 h-10 rounded-2xl bg-[#1A1A1A] border border-[#333333] text-[#FF3B30] flex items-center justify-center">
+      <Icon className="w-5 h-5" />
     </div>
-    <h3 className="text-base font-bold text-white mb-2">{title}</h3>
-    <p className="text-xs text-[#A3A3A3] leading-relaxed">{description}</p>
+    <h3 className="text-base font-black text-white">{title}</h3>
+    <p className="text-xs text-[#8E8E93] leading-relaxed">{description}</p>
   </div>
 );
 
-const TimelineStep = ({ step, title, description }) => (
-  <div className="relative pl-8 md:pl-0 md:text-center mb-8 md:mb-0 flex-1 px-2">
-    <div className="w-8 h-8 rounded-full bg-[#E50914] text-white font-extrabold flex items-center justify-center text-xs mx-auto mb-3">
-      {step}
+const RoleCard = ({ title, badge, description, email, onLaunch }) => (
+  <div className="p-7 bg-[#222222] border border-[#2D2D2D] hover:border-[#FF3B30] rounded-[28px] text-left space-y-4 transition duration-300 shadow-2xl flex flex-col justify-between">
+    <div className="space-y-3">
+      <span className="px-3.5 py-1 text-[10px] font-black bg-[#1A1A1A] text-[#FF3B30] border border-[#333333] rounded-full uppercase tracking-wider inline-block">
+        {badge}
+      </span>
+      <h3 className="text-xl font-black text-white">{title}</h3>
+      <p className="text-xs text-[#8E8E93] leading-relaxed">{description}</p>
     </div>
-    <h4 className="font-bold text-sm text-white">{title}</h4>
-    <p className="text-[11px] text-[#A3A3A3] mt-1">{description}</p>
+
+    <div className="pt-4 border-t border-[#2D2D2D] space-y-3">
+      <div className="text-[11px] text-[#8E8E93] font-medium">
+        Demo Login: <code className="text-white font-mono font-bold">{email}</code> / <code className="text-[#FF3B30] font-mono">Password123</code>
+      </div>
+      <button
+        type="button"
+        onClick={onLaunch}
+        className="w-full py-3 bg-[#1C1C1C] hover:bg-[#FF3B30] text-white text-xs font-black uppercase tracking-wider rounded-full border border-[#333333] hover:border-[#FF3B30] transition duration-300 flex items-center justify-center gap-2"
+      >
+        <span>Open Sign In</span>
+        <ArrowRight className="w-3.5 h-3.5" />
+      </button>
+    </div>
   </div>
 );
 
-const RoleCard = ({ role, badge, description, email }) => (
-  <div className="p-8 bg-[#111111] border border-[#242424] hover:border-[#7F1D1D] rounded-2xl text-left space-y-4 transition">
-    <span className="px-3 py-1 text-[10px] font-extrabold bg-[#450A0A] text-[#FF2D2D] border border-[#7F1D1D] rounded-full tracking-wider">
-      {badge}
-    </span>
-    <h3 className="text-xl font-bold text-white">{role} Portal</h3>
-    <p className="text-xs text-[#A3A3A3] leading-relaxed">{description}</p>
-    <div className="pt-4 border-t border-[#242424] text-xs">
-      <span className="text-[#737373] block">Demo Credentials:</span>
-      <code className="text-[#FF2D2D] font-mono">{email} / Password123</code>
-    </div>
-  </div>
-);
-
-const Sparkles = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-6.5l-2 2m-7 7l-2 2m0-11l2 2m7 7l2 2" />
-  </svg>
-);

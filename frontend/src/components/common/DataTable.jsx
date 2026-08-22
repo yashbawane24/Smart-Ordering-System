@@ -18,11 +18,11 @@ export const DataTable = ({ columns, data, searchPlaceholder = 'Search records..
   const paginatedData = filteredData.slice(startIndex, startIndex + pageSize);
 
   return (
-    <div className="bg-[#111111] border border-[#222222] rounded-3xl shadow-2xl overflow-hidden backdrop-blur-xl">
+    <div className="bg-[#222222] border border-[#2D2D2D] rounded-[24px] shadow-2xl overflow-hidden">
       {/* Search Header */}
-      <div className="p-4 sm:p-5 border-b border-[#1F1F1F] flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#141414]">
+      <div className="p-4 sm:p-5 border-b border-[#2D2D2D] flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#1A1A1A]">
         <div className="relative w-full sm:w-80">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#737373]" />
+          <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
           <input
             type="text"
             value={searchTerm}
@@ -31,18 +31,18 @@ export const DataTable = ({ columns, data, searchPlaceholder = 'Search records..
               setCurrentPage(1);
             }}
             placeholder={searchPlaceholder}
-            className="w-full pl-10 pr-4 py-2.5 text-xs font-semibold bg-[#0A0A0A] text-white border border-[#242424] rounded-xl placeholder-[#555555] focus:outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]/50 transition"
+            className="w-full pl-11 pr-4 py-2.5 text-xs font-semibold bg-[#242424] text-white border border-[#333333] rounded-full placeholder-[#666666] focus:outline-none focus:border-[#FF3B30] transition"
           />
         </div>
-        <div className="text-xs font-bold text-[#888888]">
-          Showing <span className="text-white font-mono">{paginatedData.length}</span> of <span className="text-[#FF2B2B] font-mono">{filteredData.length}</span> records
+        <div className="text-xs font-extrabold text-[#8E8E93]">
+          Showing <span className="text-white font-mono">{paginatedData.length}</span> of <span className="text-[#FF3B30] font-mono">{filteredData.length}</span> records
         </div>
       </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
-          <thead className="bg-[#181818] text-[#888888] font-black uppercase tracking-wider border-b border-[#1F1F1F]">
+          <thead className="bg-[#1A1A1A] text-[#8E8E93] font-black uppercase tracking-wider border-b border-[#2D2D2D]">
             <tr>
               {columns.map((col, idx) => (
                 <th key={idx} className="px-6 py-4">
@@ -51,10 +51,10 @@ export const DataTable = ({ columns, data, searchPlaceholder = 'Search records..
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#1A1A1A]">
+          <tbody className="divide-y divide-[#2D2D2D]/60">
             {paginatedData.length > 0 ? (
               paginatedData.map((row, rowIdx) => (
-                <tr key={row.id || rowIdx} className="bg-[#111111] hover:bg-[#240808] transition-colors duration-150">
+                <tr key={row.id || rowIdx} className="bg-[#222222] hover:bg-[#2A2A2A] transition-colors duration-150">
                   {columns.map((col, colIdx) => (
                     <td key={colIdx} className="px-6 py-4 text-white font-medium">
                       {col.cell ? col.cell(row) : row[col.accessor]}
@@ -64,7 +64,7 @@ export const DataTable = ({ columns, data, searchPlaceholder = 'Search records..
               ))
             ) : (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-10 text-center text-[#666666] font-bold">
+                <td colSpan={columns.length} className="px-6 py-10 text-center text-[#8E8E93] font-extrabold">
                   No records match your search query.
                 </td>
               </tr>
@@ -75,22 +75,22 @@ export const DataTable = ({ columns, data, searchPlaceholder = 'Search records..
 
       {/* Pagination Footer */}
       {totalPages > 1 && (
-        <div className="p-4 border-t border-[#1F1F1F] bg-[#141414] flex items-center justify-between">
-          <span className="text-xs font-bold text-[#888888]">
+        <div className="p-4 border-t border-[#2D2D2D] bg-[#1A1A1A] flex items-center justify-between">
+          <span className="text-xs font-extrabold text-[#8E8E93]">
             Page <span className="text-white font-mono">{currentPage}</span> of <span className="text-white font-mono">{totalPages}</span>
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="p-2 border border-[#242424] rounded-xl text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#290808] hover:border-[#7F1D1D] transition"
+              className="p-2 border border-[#333333] rounded-full text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#FF3B30] transition"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="p-2 border border-[#242424] rounded-xl text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#290808] hover:border-[#7F1D1D] transition"
+              className="p-2 border border-[#333333] rounded-full text-white disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#FF3B30] transition"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -100,4 +100,5 @@ export const DataTable = ({ columns, data, searchPlaceholder = 'Search records..
     </div>
   );
 };
+
 

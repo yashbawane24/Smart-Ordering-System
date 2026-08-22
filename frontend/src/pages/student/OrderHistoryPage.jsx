@@ -38,17 +38,17 @@ export const OrderHistoryPage = () => {
     {
       header: 'Order ID',
       accessor: 'orderNumber',
-      cell: (row) => <span className="font-mono font-bold text-[#E50914]">#{row.orderNumber}</span>
+      cell: (row) => <span className="font-mono font-black text-white">#{row.orderNumber}</span>
     },
     {
       header: 'Date & Time',
       accessor: 'createdAt',
-      cell: (row) => <span className="text-xs text-[#A3A3A3]">{formatDate(row.createdAt)}</span>
+      cell: (row) => <span className="text-xs text-[#8E8E93] font-medium">{formatDate(row.createdAt)}</span>
     },
     {
       header: 'Items',
       cell: (row) => (
-        <span className="text-xs font-medium text-white">
+        <span className="text-xs font-bold text-white">
           {row.orderItems?.map(i => `${i.quantity}x ${i.itemName}`).join(', ')}
         </span>
       )
@@ -56,7 +56,7 @@ export const OrderHistoryPage = () => {
     {
       header: 'Total Credits',
       accessor: 'totalCredits',
-      cell: (row) => <span className="font-extrabold text-[#E50914]">{formatCredits(row.totalCredits)}</span>
+      cell: (row) => <span className="font-black text-white font-mono">{formatCredits(row.totalCredits)}</span>
     },
     {
       header: 'Status',
@@ -71,32 +71,32 @@ export const OrderHistoryPage = () => {
             setSelectedOrder(row);
             setIsInvoiceOpen(true);
           }}
-          className="px-3 py-1.5 text-xs font-bold text-white bg-[#151515] border border-[#242424] hover:border-[#7F1D1D] rounded-lg transition flex items-center gap-1.5"
+          className="px-3 py-1.5 text-xs font-extrabold text-white bg-[#1A1A1A] hover:bg-[#FF3B30] border border-[#333333] hover:border-[#FF3B30] rounded-full transition flex items-center gap-1.5"
         >
-          <Eye className="w-3.5 h-3.5 text-[#FF2D2D]" /> Invoice
+          <Eye className="w-3.5 h-3.5" /> Invoice
         </button>
       )
     }
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-[1250px] mx-auto pb-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Order History</h1>
-          <p className="text-xs sm:text-sm text-[#A3A3A3]">View complete past mess orders, timestamps, and printable invoices.</p>
+          <h1 className="text-2xl font-black text-white tracking-tight">Order History</h1>
+          <p className="text-xs font-bold text-[#FF3B30]">View past mess orders & printable receipt invoices.</p>
         </div>
 
-        {/* Status Filters */}
-        <div className="flex items-center gap-1.5 bg-[#111111] border border-[#242424] p-1.5 rounded-xl">
+        {/* Segmented Status Pill Filter */}
+        <div className="flex items-center gap-1 bg-[#1A1A1A] border border-[#2D2D2D] p-1 rounded-full">
           {['ALL', 'COMPLETED', 'PENDING', 'CANCELLED'].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition ${
+              className={`px-3 py-1.5 text-[11px] font-extrabold rounded-full transition-all duration-300 ${
                 statusFilter === st
-                  ? 'bg-[#E50914] text-white shadow-sm'
-                  : 'text-[#A3A3A3] hover:text-white'
+                  ? 'btn-red-pill text-white'
+                  : 'text-[#8E8E93] hover:text-white'
               }`}
             >
               {st}
@@ -108,7 +108,9 @@ export const OrderHistoryPage = () => {
       {loading ? (
         <SkeletonLoader count={5} type="table" />
       ) : (
-        <DataTable columns={columns} data={orders} searchPlaceholder="Search order ID or item..." pageSize={10} />
+        <div className="bg-[#222222] border border-[#2D2D2D] rounded-[24px] p-4 shadow-2xl overflow-hidden">
+          <DataTable columns={columns} data={orders} searchPlaceholder="Search order number or item..." pageSize={10} />
+        </div>
       )}
 
       {/* Invoice Modal */}
@@ -116,3 +118,4 @@ export const OrderHistoryPage = () => {
     </div>
   );
 };
+
