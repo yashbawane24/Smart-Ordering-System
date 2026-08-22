@@ -1,15 +1,16 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma.js';
 import { createNotification } from './notificationService.js';
-
-const prisma = new PrismaClient();
 
 export const createOrderTransaction = async ({ studentId, items }) => {
   if (!items || !Array.isArray(items) || items.length === 0) {
     throw new Error('Order cart cannot be empty');
   }
 
-  // Execute inside a single PostgreSQL / SQLite Prisma transaction
-  return await prisma.$transaction(async (tx) => {
+  let studentUserId = null;
+  let totalOrderCredits = 0;
+
+  // Execute inside a single PostgreSQL / SQLite Prisma transaction with 15s timeout
+  const order = await prisma.$transaction(async (tx) => {
     // 1. Fetch Student & Credit Account
     const student = await tx.student.findUnique({
       where: { id: studentId },
@@ -20,18 +21,21 @@ export const createOrderTransaction = async ({ studentId, items }) => {
       throw new Error('Student account is invalid or inactive');
     }
 
+    studentUserId = student.userId;
+
     const creditAccount = student.creditAccount;
     if (!creditAccount) {
       throw new Error('Credit account not found for student');
     }
 
     // 2. Validate Menu Items Stock & Calculate Total
-    let totalOrderCredits = 0;
+    totalOrderCredits = 0;
     const validatedItems = [];
 
     for (const cartItem of items) {
+      const targetId = cartItem.menuItemId || cartItem.id;
       const menuItem = await tx.menuItem.findUnique({
-        where: { id: cartItem.menuItemId }
+        where: { id: targetId }
       });
 
       if (!menuItem) {
@@ -63,7 +67,7 @@ export const createOrderTransaction = async ({ studentId, items }) => {
     const orderNumber = `ORD-${dateStr}-${randomSuffix}`;
 
     // 5. Create Order & OrderItems
-    const order = await tx.order.create({
+    const orderRecord = await tx.order.create({
       data: {
         orderNumber,
         studentId: student.id,
@@ -115,25 +119,33 @@ export const createOrderTransaction = async ({ studentId, items }) => {
         type: 'ORDER_PAYMENT',
         amount: -totalOrderCredits,
         balanceAfter: newRemainingCredit,
-        description: `Payment for Order #${order.orderNumber}`,
-        orderId: order.id
+        description: `Payment for Order #${orderRecord.orderNumber}`,
+        orderId: orderRecord.id
       }
     });
 
-    // 9. Send Notification to Student
-    await createNotification({
-      userId: student.userId,
+    return orderRecord;
+  }, { timeout: 15000 });
+
+  // 9. Send Notification to Student AFTER transaction has committed safely
+  if (studentUserId && order) {
+    createNotification({
+      userId: studentUserId,
       title: 'Order Placed Successfully',
       message: `Your order #${order.orderNumber} for ${totalOrderCredits} credits has been received by the kitchen.`,
       type: 'ORDER_UPDATE'
-    });
+    }).catch(err => console.error('Failed to create order notification:', err));
+  }
 
-    return order;
-  });
+  return order;
 };
 
 export const cancelOrderTransaction = async ({ orderId, studentId }) => {
-  return await prisma.$transaction(async (tx) => {
+  let studentUserId = null;
+  let orderNumberStr = '';
+  let refundedCredits = 0;
+
+  const updatedOrder = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findUnique({
       where: { id: orderId },
       include: {
@@ -154,8 +166,12 @@ export const cancelOrderTransaction = async ({ orderId, studentId }) => {
       throw new Error(`Order cannot be cancelled. Current status is ${order.status}. Only PENDING orders can be cancelled.`);
     }
 
+    studentUserId = order.student.userId;
+    orderNumberStr = order.orderNumber;
+    refundedCredits = order.totalCredits;
+
     // 1. Update Order Status
-    const updatedOrder = await tx.order.update({
+    const result = await tx.order.update({
       where: { id: orderId },
       data: { status: 'CANCELLED' }
     });
@@ -200,16 +216,20 @@ export const cancelOrderTransaction = async ({ orderId, studentId }) => {
       }
     });
 
-    // 5. Notify Student
-    await createNotification({
-      userId: order.student.userId,
-      title: 'Order Cancelled & Refunded',
-      message: `Order #${order.orderNumber} cancelled. ${order.totalCredits} credits refunded to your wallet.`,
-      type: 'REFUND'
-    });
+    return result;
+  }, { timeout: 15000 });
 
-    return updatedOrder;
-  });
+  // 5. Notify Student AFTER transaction has committed safely
+  if (studentUserId && updatedOrder) {
+    createNotification({
+      userId: studentUserId,
+      title: 'Order Cancelled & Refunded',
+      message: `Order #${orderNumberStr} cancelled. ${refundedCredits} credits refunded to your wallet.`,
+      type: 'REFUND'
+    }).catch(err => console.error('Failed to create refund notification:', err));
+  }
+
+  return updatedOrder;
 };
 
 export const updateOrderStatusChef = async (orderId, newStatus) => {
@@ -233,14 +253,15 @@ export const updateOrderStatusChef = async (orderId, newStatus) => {
     };
 
     if (statusMessages[newStatus]) {
-      await createNotification({
+      createNotification({
         userId: order.student.userId,
         title: `Order Status: ${newStatus}`,
         message: statusMessages[newStatus],
         type: 'ORDER_UPDATE'
-      });
+      }).catch(err => console.error('Notification error:', err));
     }
   }
 
   return order;
 };
+

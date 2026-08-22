@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma.js';
 import bcrypt from 'bcryptjs';
 import { successResponse, errorResponse } from '../utils/response.js';
-
-const prisma = new PrismaClient();
 
 export const getAdminDashboardStats = async (req, res, next) => {
   try {

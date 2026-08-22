@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 
-const prisma = new PrismaClient();
 
 export const getAllMenuItems = async (req, res, next) => {
   try {

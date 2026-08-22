@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 import { createOrderTransaction, cancelOrderTransaction, updateOrderStatusChef } from '../services/orderService.js';
 
-const prisma = new PrismaClient();
 
 export const placeOrder = async (req, res, next) => {
   try {

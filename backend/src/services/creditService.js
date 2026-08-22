@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma.js';
 import { createNotification } from './notificationService.js';
 
-const prisma = new PrismaClient();
 
 export const getStudentCreditAccount = async (studentId) => {
   let creditAccount = await prisma.creditAccount.findUnique({

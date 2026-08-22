@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import prisma from '../utils/prisma.js';
 
 export const createNotification = async ({ userId, title, message, type = 'GENERAL' }) => {
   try {
@@ -37,3 +36,4 @@ export const markAllNotificationsRead = async (userId) => {
     data: { isRead: true }
   });
 };
+

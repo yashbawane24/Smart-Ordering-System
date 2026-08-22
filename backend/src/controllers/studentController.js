@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import { successResponse, errorResponse } from '../utils/response.js';
 import { getStudentCreditAccount } from '../services/creditService.js';
-
-const prisma = new PrismaClient();
+import prisma from '../utils/prisma.js';
 
 export const getStudentDashboard = async (req, res, next) => {
   try {

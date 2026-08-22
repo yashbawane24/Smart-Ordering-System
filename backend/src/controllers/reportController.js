@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../utils/prisma.js';
 import { successResponse } from '../utils/response.js';
 
-const prisma = new PrismaClient();
 
 export const getAdminReportsData = async (req, res, next) => {
   try {
