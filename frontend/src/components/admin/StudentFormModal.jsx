@@ -27,14 +27,15 @@ export const StudentFormModal = ({ isOpen, onClose, onSubmit, initialData }) => 
       setFormData({
         name: '',
         email: '',
-        password: 'Password123',
+        password: '',
         phone: '+91 ',
-        studentIdStr: `21BCE${Math.floor(1000 + Math.random() * 9000)}`,
-        hostel: 'Block A, Mens Hostel',
-        roomNumber: '101'
+        studentIdStr: `23BCE${Math.floor(1000 + Math.random() * 9000)}`,
+        hostel: 'MH-A (Mens Hostel Block A)',
+        roomNumber: 'A-101'
       });
     }
   }, [initialData, isOpen]);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();

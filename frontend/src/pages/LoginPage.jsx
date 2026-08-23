@@ -5,8 +5,8 @@ import { Flame, ArrowRight, AlertCircle, KeyRound, Mail, Sparkles } from 'lucide
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const LoginPage = () => {
-  const [email, setEmail] = useState('student@vit.edu');
-  const [password, setPassword] = useState('Password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeRole, setActiveRole] = useState('STUDENT');
@@ -17,22 +17,6 @@ export const LoginPage = () => {
   const handleRoleSelect = (role) => {
     setActiveRole(role);
     setError('');
-    switch (role) {
-      case 'STUDENT':
-        setEmail('student@vit.edu');
-        setPassword('Password123');
-        break;
-      case 'CHEF':
-        setEmail('chef@vit.edu');
-        setPassword('Password123');
-        break;
-      case 'ADMIN':
-        setEmail('admin@vit.edu');
-        setPassword('Password123');
-        break;
-      default:
-        break;
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -68,10 +52,10 @@ export const LoginPage = () => {
           <p className="text-[11px] font-black tracking-widest text-[#FF3B30] uppercase flex items-center justify-center gap-1 pt-1">
             <Sparkles className="w-3.5 h-3.5 text-[#FF3B30]" /> SMART ORDERING. ZERO WAITING.
           </p>
-          <h2 className="text-lg font-black text-white tracking-tight pt-1">Welcome Back</h2>
+          <h2 className="text-lg font-black text-white tracking-tight pt-1">Sign In to Portal</h2>
         </div>
 
-        {/* Role Selector Tabs (Reference Pill Segmented Control) */}
+        {/* Role Selector Tabs */}
         <div className="grid grid-cols-3 gap-1 p-1 bg-[#141414] rounded-full border border-[#2D2D2D] mb-6">
           {['STUDENT', 'CHEF', 'ADMIN'].map((role) => (
             <button
@@ -109,7 +93,7 @@ export const LoginPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-11 pr-4 py-3.5 text-xs bg-[#242424] text-white border border-[#333333] rounded-full focus:outline-none focus:border-[#FF3B30] transition placeholder:text-[#666666]"
-                placeholder="email@vit.edu"
+                placeholder="student@college.edu.in"
               />
             </div>
           </div>
@@ -137,7 +121,7 @@ export const LoginPage = () => {
             {loading ? (
               <div className="flex items-center gap-2">
                 <LoadingSpinner size="sm" className="border-white border-t-transparent" />
-                <span>SIGNING IN (CONNECTING...)</span>
+                <span>SIGNING IN...</span>
               </div>
             ) : (
               <>
@@ -146,29 +130,22 @@ export const LoginPage = () => {
               </>
             )}
           </button>
-
         </form>
 
-        {/* Demo Credentials & Registration Link */}
-        <div className="mt-8 pt-6 border-t border-[#2D2D2D] text-center space-y-4">
+        {/* Registration Link */}
+        <div className="mt-8 pt-6 border-t border-[#2D2D2D] text-center">
           <p className="text-xs font-bold text-[#8E8E93]">
             Don't have an account?{' '}
             <Link to="/register" className="text-[#FF3B30] hover:underline font-black">
               Register Here →
             </Link>
           </p>
-          <div>
-            <span className="text-[10px] text-[#8E8E93] block mb-1 font-extrabold uppercase tracking-wider">Quick Demo Credentials</span>
-            <div className="p-3 bg-[#141414] rounded-2xl border border-[#2D2D2D] text-xs font-mono text-[#FF3B30] space-y-0.5">
-              <p>Email: <span className="text-white font-bold">{email}</span></p>
-              <p>Password: <span className="text-white font-bold">Password123</span></p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   );
 };
+
 
 
 

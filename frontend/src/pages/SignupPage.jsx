@@ -101,7 +101,7 @@ export const SignupPage = () => {
               <input
                 type="text"
                 required
-                placeholder="Alex Johnson"
+                placeholder="Aarav Sharma"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full pl-11 pr-4 py-3 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
@@ -110,13 +110,13 @@ export const SignupPage = () => {
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-[#8E8E93] uppercase tracking-widest mb-1">Email Address</label>
+            <label className="block text-[10px] font-black text-[#8E8E93] uppercase tracking-widest mb-1">College Email Address</label>
             <div className="relative">
               <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
               <input
                 type="email"
                 required
-                placeholder="student@vit.edu"
+                placeholder="student@college.edu.in"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 className="w-full pl-11 pr-4 py-3 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
@@ -148,7 +148,7 @@ export const SignupPage = () => {
                     <Hash className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
                     <input
                       type="text"
-                      placeholder="21BCE1042"
+                      placeholder="23BCE1042"
                       value={formData.studentIdStr}
                       onChange={(e) => setFormData({ ...formData, studentIdStr: e.target.value })}
                       className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
@@ -157,12 +157,12 @@ export const SignupPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-[#8E8E93] uppercase tracking-widest mb-1">Phone Number</label>
+                  <label className="block text-[10px] font-black text-[#8E8E93] uppercase tracking-widest mb-1">Phone Number (+91)</label>
                   <div className="relative">
                     <Phone className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
                     <input
                       type="text"
-                      placeholder="+91 9876543210"
+                      placeholder="+91 98765 43210"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
@@ -176,13 +176,18 @@ export const SignupPage = () => {
                   <label className="block text-[10px] font-black text-[#8E8E93] uppercase tracking-widest mb-1">Hostel Block</label>
                   <div className="relative">
                     <Home className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
-                    <input
-                      type="text"
-                      placeholder="Block A, Mens Hostel"
+                    <select
                       value={formData.hostel}
                       onChange={(e) => setFormData({ ...formData, hostel: e.target.value })}
-                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
-                    />
+                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] appearance-none"
+                    >
+                      <option value="MH-A (Mens Hostel Block A)">MH-A (Mens Hostel Block A)</option>
+                      <option value="MH-B (Mens Hostel Block B)">MH-B (Mens Hostel Block B)</option>
+                      <option value="MH-C (Mens Hostel Block C)">MH-C (Mens Hostel Block C)</option>
+                      <option value="LH-1 (Ladies Hostel Block 1)">LH-1 (Ladies Hostel Block 1)</option>
+                      <option value="LH-2 (Ladies Hostel Block 2)">LH-2 (Ladies Hostel Block 2)</option>
+                      <option value="SJT Mess Hostel">SJT Mess Hostel</option>
+                    </select>
                   </div>
                 </div>
 
@@ -199,10 +204,11 @@ export const SignupPage = () => {
               </div>
 
               <div className="p-3 bg-[#062D15] border border-[#166534] rounded-2xl text-[11px] font-bold text-[#4ADE80] flex items-center gap-2">
-                <span>🎁 New accounts automatically receive 9,000 monthly credits wallet allowance!</span>
+                <span>🎁 New student registrations receive ₹9,000 Monthly Mess Credit Allowance!</span>
               </div>
             </>
           )}
+
 
           <button
             type="submit"

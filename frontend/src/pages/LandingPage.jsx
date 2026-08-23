@@ -142,20 +142,20 @@ export const LandingPage = () => {
             <div className="bg-[#222222] border border-[#2D2D2D] rounded-[24px] p-4 text-center relative mt-6 pt-10">
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full overflow-hidden shadow-xl border-2 border-[#333333]">
                 <img
-                  src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&auto=format&fit=crop&q=80"
-                  alt="Hamburger"
+                  src="https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=300&auto=format&fit=crop&q=80"
+                  alt="Paneer Butter Masala"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h4 className="text-sm font-black text-white">Hamburger</h4>
-              <p className="text-[10px] text-[#8E8E93] font-bold">Starting From</p>
-              <div className="text-sm font-black text-white font-mono">$10.00</div>
+              <h4 className="text-sm font-black text-white">Paneer Butter Masala</h4>
+              <p className="text-[10px] text-[#8E8E93] font-bold">Special Combo</p>
+              <div className="text-sm font-black text-[#FF3B30] font-mono">₹130</div>
               <div className="flex items-center justify-between pt-2 mt-2 border-t border-[#2D2D2D] text-[10px] font-bold text-[#8E8E93]">
                 <div className="flex items-center gap-1 text-white">
                   <Star className="w-3 h-3 text-[#FFCC00] fill-[#FFCC00]" />
-                  <span>4.8</span>
+                  <span>4.9</span>
                 </div>
-                <span>1250 Sales</span>
+                <span>1850 Orders</span>
               </div>
             </div>
 
@@ -163,20 +163,20 @@ export const LandingPage = () => {
             <div className="bg-[#222222] border border-[#2D2D2D] rounded-[24px] p-4 text-center relative mt-6 pt-10">
               <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full overflow-hidden shadow-xl border-2 border-[#333333]">
                 <img
-                  src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop&q=80"
-                  alt="Pepperoni Pizza"
+                  src="https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=300&auto=format&fit=crop&q=80"
+                  alt="Masala Dosa"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <h4 className="text-sm font-black text-white">Pepperoni Pizza</h4>
-              <p className="text-[10px] text-[#8E8E93] font-bold">Starting From</p>
-              <div className="text-sm font-black text-white font-mono">$15.50</div>
+              <h4 className="text-sm font-black text-white">Special Masala Dosa</h4>
+              <p className="text-[10px] text-[#8E8E93] font-bold">Breakfast Special</p>
+              <div className="text-sm font-black text-[#FF3B30] font-mono">₹60</div>
               <div className="flex items-center justify-between pt-2 mt-2 border-t border-[#2D2D2D] text-[10px] font-bold text-[#8E8E93]">
                 <div className="flex items-center gap-1 text-white">
                   <Star className="w-3 h-3 text-[#FFCC00] fill-[#FFCC00]" />
-                  <span>4.9</span>
+                  <span>4.8</span>
                 </div>
-                <span>2100 Sales</span>
+                <span>2400 Orders</span>
               </div>
             </div>
 
@@ -188,13 +188,13 @@ export const LandingPage = () => {
                 </span>
                 <span className="text-[#8E8E93]">ID: #1099</span>
               </div>
-              <div className="grid grid-cols-3 gap-1 p-1 bg-[#1A1A1A] rounded-full border border-[#2D2D2D] text-[10px] text-center">
-                <div className="btn-red-pill py-1 text-white font-extrabold">Delivery</div>
-                <div className="py-1 text-[#8E8E93] font-bold">Dine in</div>
-                <div className="py-1 text-[#8E8E93] font-bold">Takeaway</div>
+              <div className="grid grid-cols-3 gap-1 p-1 bg-[#1A1A1A] rounded-full border border-[#2D2D2D] text-[9px] text-center">
+                <div className="btn-red-pill py-1 text-white font-extrabold">Mess Hall</div>
+                <div className="py-1 text-[#8E8E93] font-bold">Hostel Parcel</div>
+                <div className="py-1 text-[#8E8E93] font-bold">Counter Pickup</div>
               </div>
-              <div className="py-3 px-4 bg-[#1C1C1C] text-white text-[11px] font-black rounded-full text-center uppercase tracking-widest">
-                Confirm Order
+              <div className="py-3 px-4 bg-[#FF3B30] text-white text-[11px] font-black rounded-full text-center uppercase tracking-widest">
+                Confirm Mess Order
               </div>
             </div>
 
@@ -213,8 +213,8 @@ export const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <FeatureCard
               icon={CreditCard}
-              title="9,000 Monthly Credits"
-              description="Automatic balance reset every month. Students place orders without cash or physical tokens."
+              title="₹9,000 Monthly Credits"
+              description="Automatic credit balance allowance every month. Students place mess orders without cash transactions."
             />
             <FeatureCard
               icon={Clock}
@@ -248,30 +248,27 @@ export const LandingPage = () => {
       {/* Interactive Role Portals Section */}
       <section id="demo-roles" className="py-20 max-w-7xl mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
-          <h2 className="text-xs font-black uppercase tracking-widest text-[#FF3B30]">LIVE ACCESS PORTALS</h2>
-          <p className="text-3xl sm:text-4xl font-black text-white">Try Any Role Portal Instant Launch</p>
+          <h2 className="text-xs font-black uppercase tracking-widest text-[#FF3B30]">OFFICIAL PORTALS</h2>
+          <p className="text-3xl sm:text-4xl font-black text-white">Access Smart Mess System Portals</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <RoleCard
             title="Student Portal"
             badge="STUDENT"
-            description="Browse today's menu, filter by category disk, add pop-out dishes to cart, and use monthly credit balance."
-            email="student@vit.edu"
+            description="Browse today's mess menu, filter by meal type, add Indian dishes to cart, and use monthly ₹9,000 credit allowance."
             onLaunch={() => navigate('/login')}
           />
           <RoleCard
             title="Chef Kitchen Portal"
             badge="CHEF"
             description="Live kitchen order Kanban columns. Accept orders, mark items preparing, and toggle dish availability."
-            email="chef@vit.edu"
             onLaunch={() => navigate('/login')}
           />
           <RoleCard
             title="Admin Management"
             badge="ADMIN"
             description="Full mess administrative control. Manage students, chefs, menu prices, monthly credit top-ups, and sales."
-            email="admin@vit.edu"
             onLaunch={() => navigate('/login')}
           />
         </div>
@@ -287,7 +284,7 @@ export const LandingPage = () => {
             <span className="font-extrabold text-white text-sm">Smart Mess Digital System</span>
           </div>
           <p className="text-center md:text-right text-[#8E8E93]">
-            VIT College Capstone Project | Production Ready SaaS Architecture
+            Indian College Smart Digital Mess & Credit Management Portal
           </p>
         </div>
       </footer>
@@ -306,7 +303,7 @@ const FeatureCard = ({ icon: Icon, title, description }) => (
   </div>
 );
 
-const RoleCard = ({ title, badge, description, email, onLaunch }) => (
+const RoleCard = ({ title, badge, description, onLaunch }) => (
   <div className="p-7 bg-[#222222] border border-[#2D2D2D] hover:border-[#FF3B30] rounded-[28px] text-left space-y-4 transition duration-300 shadow-2xl flex flex-col justify-between">
     <div className="space-y-3">
       <span className="px-3.5 py-1 text-[10px] font-black bg-[#1A1A1A] text-[#FF3B30] border border-[#333333] rounded-full uppercase tracking-wider inline-block">
@@ -316,14 +313,11 @@ const RoleCard = ({ title, badge, description, email, onLaunch }) => (
       <p className="text-xs text-[#8E8E93] leading-relaxed">{description}</p>
     </div>
 
-    <div className="pt-4 border-t border-[#2D2D2D] space-y-3">
-      <div className="text-[11px] text-[#8E8E93] font-medium">
-        Demo Login: <code className="text-white font-mono font-bold">{email}</code> / <code className="text-[#FF3B30] font-mono">Password123</code>
-      </div>
+    <div className="pt-4 border-t border-[#2D2D2D]">
       <button
         type="button"
         onClick={onLaunch}
-        className="w-full py-3 bg-[#1C1C1C] hover:bg-[#FF3B30] text-white text-xs font-black uppercase tracking-wider rounded-full border border-[#333333] hover:border-[#FF3B30] transition duration-300 flex items-center justify-center gap-2"
+        className="w-full py-3.5 bg-[#FF3B30] hover:brightness-110 text-white text-xs font-black uppercase tracking-wider rounded-full border border-[#FF3B30] transition duration-300 flex items-center justify-center gap-2 shadow-lg shadow-[#FF3B30]/30"
       >
         <span>Open Sign In</span>
         <ArrowRight className="w-3.5 h-3.5" />
@@ -331,4 +325,5 @@ const RoleCard = ({ title, badge, description, email, onLaunch }) => (
     </div>
   </div>
 );
+
 

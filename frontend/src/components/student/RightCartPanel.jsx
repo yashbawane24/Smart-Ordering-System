@@ -64,18 +64,20 @@ export const RightCartPanel = ({ onOrderPlaced }) => {
     <aside className="w-full lg:w-[350px] xl:w-[390px] bg-[#222222] border border-[#2D2D2D] rounded-[28px] p-5 flex flex-col justify-between shadow-2xl relative overflow-hidden shrink-0">
       
       <div className="space-y-4">
-        {/* Delivery Address Header Card (from reference image top) */}
+        {/* Delivery Address Header Card */}
         <div className="bg-[#2B2B2B] rounded-2xl p-4 border border-[#333333] space-y-2">
           <h4 className="text-[10px] font-black text-[#8E8E93] uppercase tracking-widest">
-            DELIVERY ADDRESS
+            HOSTEL DELIVERY & MESS PICKUP
           </h4>
           <div className="flex items-start gap-2 text-xs font-bold text-white">
             <MapPin className="w-4 h-4 text-[#FF3B30] shrink-0 mt-0.5" />
-            <span className="line-clamp-1">Po. 1478, Street No. 52, West New York</span>
+            <span className="line-clamp-1">
+              {user?.student?.hostel || 'MH-A Mens Hostel'}, Room {user?.student?.roomNumber || 'A-304'}
+            </span>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-[#8E8E93] font-semibold">
             <Clock className="w-3.5 h-3.5 text-[#8E8E93]" />
-            <span>20 min prep time</span>
+            <span>15-20 min mess prep time</span>
           </div>
         </div>
 
@@ -83,49 +85,50 @@ export const RightCartPanel = ({ onOrderPlaced }) => {
         <div className="flex items-center justify-between pt-1">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-4 h-4 text-white" />
-            <h3 className="text-sm font-black text-white tracking-wide">Cart</h3>
+            <h3 className="text-sm font-black text-white tracking-wide">Mess Cart</h3>
           </div>
           <span className="text-[11px] font-bold text-[#8E8E93]">
-            Order ID: #1099
+            {totalItemsCount} {totalItemsCount === 1 ? 'item' : 'items'}
           </span>
         </div>
 
-        {/* Segmented Control (Delivery / Dine in / Takeaway) matching reference red gradient pill */}
+        {/* Segmented Control (Mess Hall / Hostel Parcel / Counter Pickup) */}
         <div className="grid grid-cols-3 gap-1 p-1 bg-[#1A1A1A] rounded-full border border-[#2D2D2D]">
           <button
             type="button"
-            onClick={() => setOrderType('DELIVERY')}
-            className={`py-2 text-[11px] font-extrabold rounded-full transition-all duration-300 ${
-              orderType === 'DELIVERY'
-                ? 'btn-red-pill text-white'
-                : 'text-[#8E8E93] hover:text-white'
-            }`}
-          >
-            Delivery
-          </button>
-          <button
-            type="button"
             onClick={() => setOrderType('DINE_IN')}
-            className={`py-2 text-[11px] font-extrabold rounded-full transition-all duration-300 ${
+            className={`py-2 text-[10px] font-extrabold rounded-full transition-all duration-300 ${
               orderType === 'DINE_IN'
                 ? 'btn-red-pill text-white'
                 : 'text-[#8E8E93] hover:text-white'
             }`}
           >
-            Dine in
+            Mess Hall
+          </button>
+          <button
+            type="button"
+            onClick={() => setOrderType('DELIVERY')}
+            className={`py-2 text-[10px] font-extrabold rounded-full transition-all duration-300 ${
+              orderType === 'DELIVERY'
+                ? 'btn-red-pill text-white'
+                : 'text-[#8E8E93] hover:text-white'
+            }`}
+          >
+            Hostel Parcel
           </button>
           <button
             type="button"
             onClick={() => setOrderType('TAKEAWAY')}
-            className={`py-2 text-[11px] font-extrabold rounded-full transition-all duration-300 ${
+            className={`py-2 text-[10px] font-extrabold rounded-full transition-all duration-300 ${
               orderType === 'TAKEAWAY'
                 ? 'btn-red-pill text-white'
                 : 'text-[#8E8E93] hover:text-white'
             }`}
           >
-            Takeaway
+            Counter Pickup
           </button>
         </div>
+
 
         {/* Error / Success feedback */}
         {error && (
