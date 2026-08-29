@@ -1,4 +1,4 @@
-// Prisma Schema for Smart Digital Mess Ordering System
+// Prisma Schema for Smart Campus Mess Operations & Meal Management System
 
 generator client {
   provider = "prisma-client-js"
@@ -8,7 +8,6 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 
 model User {
   id            String         @id @default(uuid())
@@ -37,8 +36,15 @@ model Student {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
-  creditAccount CreditAccount?
-  orders        Order[]
+  creditAccount         CreditAccount?
+  studentMealPlans      StudentMealPlan[]
+  declarations          MealDeclaration[]
+  slotBookings          SlotBooking[]
+  entitlementUsages     MealEntitlementUsage[]
+  orders                Order[]
+  feedbacks             MealFeedback[]
+  complaints            Complaint[]
+  votes                 MenuVote[]
 }
 
 model Chef {
@@ -99,6 +105,7 @@ model MenuItem {
   updatedAt         DateTime    @updatedAt
 
   orderItems        OrderItem[]
+  pollOptions       MenuPollOption[]
 }
 
 model Order {
@@ -107,12 +114,17 @@ model Order {
   studentId          String
   student            Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
   totalCredits       Float
-  status             String              @default("PENDING") // PENDING, ACCEPTED, PREPARING, READY, COMPLETED, CANCELLED
+  status             String              @default("PENDING") // PENDING, ACCEPTED, PREPARING, READY, COLLECTED, NO_SHOW, CANCELLED
+  slotBookingId      String?
+  slotBooking        SlotBooking?        @relation(fields: [slotBookingId], references: [id], onDelete: SetNull)
+  isEntitlementUsed  Boolean             @default(false)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 
   orderItems         OrderItem[]
   creditTransactions CreditTransaction[]
+  collectionToken    CollectionToken?
+  feedback           MealFeedback?
 }
 
 model OrderItem {
@@ -134,6 +146,168 @@ model Notification {
   title     String
   message   String
   isRead    Boolean  @default(false)
-  type      String   @default("INFO") // ORDER_UPDATE, REFUND, CREDIT_ALERT, GENERAL
+  type      String   @default("INFO") // ORDER_UPDATE, REFUND, CREDIT_ALERT, MEAL_DECLARATION, SLOT_BOOKED, NO_SHOW, GENERAL
   createdAt DateTime @default(now())
+}
+
+// ==========================================
+// INSTITUTIONAL MESS MANAGEMENT NEW MODELS
+// ==========================================
+
+model MealPlan {
+  id                   String            @id @default(uuid())
+  name                 String            // e.g. "Standard Campus Meal Plan"
+  monthlyCreditLimit   Float             @default(9000.0)
+  breakfastEntitlement Int               @default(1)
+  lunchEntitlement     Int               @default(1)
+  dinnerEntitlement    Int               @default(1)
+  isActive             Boolean           @default(true)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  studentMealPlans     StudentMealPlan[]
+}
+
+model StudentMealPlan {
+  id          String   @id @default(uuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  mealPlanId  String
+  mealPlan    MealPlan @relation(fields: [mealPlanId], references: [id], onDelete: Cascade)
+  startDate   DateTime @default(now())
+  endDate     DateTime?
+  status      String   @default("ACTIVE") // ACTIVE, EXPIRED, CANCELLED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MealDeclaration {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  mealDate  String   // "YYYY-MM-DD"
+  mealType  String   // Breakfast, Lunch, Dinner
+  status    String   @default("DECLARED") // DECLARED, SKIPPED, NOT_DECLARED
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, mealDate, mealType])
+}
+
+model MealSlot {
+  id          String        @id @default(uuid())
+  mealType    String        // Breakfast, Lunch, Dinner
+  slotDate    String        // "YYYY-MM-DD"
+  startTime   String        // "12:30"
+  endTime     String        // "12:45"
+  capacity    Int           @default(50)
+  bookedCount Int           @default(0)
+  status      String        @default("ACTIVE") // ACTIVE, FULL, CLOSED
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  bookings    SlotBooking[]
+}
+
+model SlotBooking {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  slotId    String
+  slot      MealSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  mealDate  String   // "YYYY-MM-DD"
+  status    String   @default("BOOKED") // BOOKED, CANCELLED, COMPLETED
+  createdAt DateTime @default(now())
+
+  orders    Order[]
+
+  @@unique([studentId, slotId, mealDate])
+}
+
+model MealEntitlementUsage {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  usageDate String   // "YYYY-MM-DD"
+  mealType  String   // Breakfast, Lunch, Dinner
+  orderId   String?
+  usageType String   @default("STANDARD") // STANDARD, EXTRA
+  createdAt DateTime @default(now())
+}
+
+model CollectionToken {
+  id        String    @id @default(uuid())
+  orderId   String    @unique
+  order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  token     String    @unique // Secure random collection token
+  expiresAt DateTime
+  usedAt    DateTime?
+  status    String    @default("ACTIVE") // ACTIVE, USED, EXPIRED
+  createdAt DateTime  @default(now())
+}
+
+model MealFeedback {
+  id                 String     @id @default(uuid())
+  studentId          String
+  student            Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  orderId            String     @unique
+  order              Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  foodQualityRating  Int        // 1 to 5
+  quantityRating     Int        // 1 to 5
+  temperatureRating Int        // 1 to 5
+  issues             String?    // Comma-separated or JSON list of issue tags
+  comment            String?
+  createdAt          DateTime   @default(now())
+
+  complaint          Complaint?
+}
+
+model Complaint {
+  id             String        @id @default(uuid())
+  studentId      String
+  student        Student       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  feedbackId     String?       @unique
+  feedback       MealFeedback? @relation(fields: [feedbackId], references: [id], onDelete: SetNull)
+  issueType      String
+  description    String
+  status         String        @default("OPEN") // OPEN, UNDER_REVIEW, RESOLVED
+  resolutionNote String?
+  createdAt      DateTime      @default(now())
+  resolvedAt     DateTime?
+}
+
+model MenuPoll {
+  id          String           @id @default(uuid())
+  title       String
+  description String?
+  startTime   DateTime         @default(now())
+  endTime     DateTime
+  status      String           @default("ACTIVE") // ACTIVE, CLOSED
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  options     MenuPollOption[]
+  votes       MenuVote[]
+}
+
+model MenuPollOption {
+  id         String     @id @default(uuid())
+  pollId     String
+  poll       MenuPoll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  menuItemId String?
+  menuItem   MenuItem?  @relation(fields: [menuItemId], references: [id], onDelete: SetNull)
+  optionName String
+  votes      MenuVote[]
+}
+
+model MenuVote {
+  id        String         @id @default(uuid())
+  pollId    String
+  poll      MenuPoll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  optionId  String
+  option    MenuPollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  studentId String
+  student   Student        @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+
+  @@unique([pollId, studentId])
 }

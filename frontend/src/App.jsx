@@ -12,7 +12,6 @@ import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
-
 // Student Pages
 import { StudentDashboardPage } from './pages/student/StudentDashboardPage';
 import { MenuPage } from './pages/student/MenuPage';
@@ -22,12 +21,19 @@ import { OrderHistoryPage } from './pages/student/OrderHistoryPage';
 import { CreditHistoryPage } from './pages/student/CreditHistoryPage';
 import { ProfilePage } from './pages/student/ProfilePage';
 import { SettingsPage } from './pages/student/SettingsPage';
+import { MyMealsPage } from './pages/student/MyMealsPage';
+import { MealSlotsPage } from './pages/student/MealSlotsPage';
+import { QRCollectionPage } from './pages/student/QRCollectionPage';
+import { StudentFeedbackPage } from './pages/student/StudentFeedbackPage';
+import { StudentPollsPage } from './pages/student/StudentPollsPage';
 
 // Chef Pages
 import { ChefDashboardPage } from './pages/chef/ChefDashboardPage';
 import { ChefFilteredOrdersPage } from './pages/chef/ChefFilteredOrdersPage';
 import { ChefMenuAvailabilityPage } from './pages/chef/ChefMenuAvailabilityPage';
 import { ChefProfilePage } from './pages/chef/ChefProfilePage';
+import { ChefVerifyQRPage } from './pages/chef/ChefVerifyQRPage';
+import { ChefDemandPage } from './pages/chef/ChefDemandPage';
 
 // Admin Pages
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
@@ -38,6 +44,11 @@ import { CreditManagementPage } from './pages/admin/CreditManagementPage';
 import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
 import { ReportsPage } from './pages/admin/ReportsPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
+import { AdminSlotsPage } from './pages/admin/AdminSlotsPage';
+import { AdminDemandPlanningPage } from './pages/admin/AdminDemandPlanningPage';
+import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage';
+import { AdminFeedbackPage } from './pages/admin/AdminFeedbackPage';
+import { AdminPollsPage } from './pages/admin/AdminPollsPage';
 
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 
@@ -46,7 +57,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#080808] text-white">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -57,7 +68,6 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    // Redirect to proper role dashboard
     if (user.role === 'STUDENT') return <Navigate to="/student" replace />;
     if (user.role === 'CHEF') return <Navigate to="/chef" replace />;
     if (user.role === 'ADMIN') return <Navigate to="/admin" replace />;
@@ -76,7 +86,6 @@ export const App = () => {
         <Route path="/register" element={<SignupPage />} />
       </Route>
 
-
       {/* Protected Student Portal */}
       <Route
         path="/student"
@@ -88,10 +97,15 @@ export const App = () => {
       >
         <Route index element={<StudentDashboardPage />} />
         <Route path="menu" element={<MenuPage />} />
+        <Route path="meals" element={<MyMealsPage />} />
+        <Route path="slots" element={<MealSlotsPage />} />
         <Route path="cart" element={<CartPage />} />
         <Route path="current-order" element={<CurrentOrderPage />} />
         <Route path="history" element={<OrderHistoryPage />} />
         <Route path="credits" element={<CreditHistoryPage />} />
+        <Route path="qr-collection" element={<QRCollectionPage />} />
+        <Route path="feedback" element={<StudentFeedbackPage />} />
+        <Route path="polls" element={<StudentPollsPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />
       </Route>
@@ -136,6 +150,8 @@ export const App = () => {
             />
           }
         />
+        <Route path="verify-qr" element={<ChefVerifyQRPage />} />
+        <Route path="demand" element={<ChefDemandPage />} />
         <Route path="availability" element={<ChefMenuAvailabilityPage />} />
         <Route path="profile" element={<ChefProfilePage />} />
       </Route>
@@ -153,6 +169,11 @@ export const App = () => {
         <Route path="students" element={<StudentManagementPage />} />
         <Route path="chefs" element={<ChefManagementPage />} />
         <Route path="menu" element={<AdminMenuManagementPage />} />
+        <Route path="slots" element={<AdminSlotsPage />} />
+        <Route path="demand" element={<AdminDemandPlanningPage />} />
+        <Route path="analytics" element={<AdminAnalyticsPage />} />
+        <Route path="feedback" element={<AdminFeedbackPage />} />
+        <Route path="polls" element={<AdminPollsPage />} />
         <Route path="credits" element={<CreditManagementPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />
         <Route path="reports" element={<ReportsPage />} />

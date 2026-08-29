@@ -4,9 +4,21 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting database seeding...');
+  console.log('🌱 Starting database seeding for Smart Campus Mess Operations...');
 
-  // Clean existing data
+  // Clean existing data in reverse dependency order
+  await prisma.menuVote.deleteMany();
+  await prisma.menuPollOption.deleteMany();
+  await prisma.menuPoll.deleteMany();
+  await prisma.complaint.deleteMany();
+  await prisma.mealFeedback.deleteMany();
+  await prisma.collectionToken.deleteMany();
+  await prisma.mealEntitlementUsage.deleteMany();
+  await prisma.slotBooking.deleteMany();
+  await prisma.mealSlot.deleteMany();
+  await prisma.mealDeclaration.deleteMany();
+  await prisma.studentMealPlan.deleteMany();
+  await prisma.mealPlan.deleteMany();
   await prisma.notification.deleteMany();
   await prisma.orderItem.deleteMany();
   await prisma.creditTransaction.deleteMany();
@@ -22,8 +34,23 @@ async function main() {
 
   const hashedPassword = await bcrypt.hash('Password123', 10);
   const currentMonth = '2026-08';
+  const todayStr = new Date().toISOString().split('T')[0];
+  const tomorrowObj = new Date(Date.now() + 86400000);
+  const tomorrowStr = tomorrowObj.toISOString().split('T')[0];
 
-  // 1. Create Primary Demo Users
+  // 1. Create Default Institutional Meal Plan
+  const defaultMealPlan = await prisma.mealPlan.create({
+    data: {
+      name: 'Standard Campus Institutional Meal Plan',
+      monthlyCreditLimit: 9000.0,
+      breakfastEntitlement: 1,
+      lunchEntitlement: 1,
+      dinnerEntitlement: 1,
+      isActive: true
+    }
+  });
+
+  // 2. Create Primary Demo Users
   // Demo Student
   const demoStudentUser = await prisma.user.create({
     data: {
@@ -44,6 +71,12 @@ async function main() {
               remainingCredit: 8700.0,
               monthYear: currentMonth
             }
+          },
+          studentMealPlans: {
+            create: {
+              mealPlanId: defaultMealPlan.id,
+              status: 'ACTIVE'
+            }
           }
         }
       }
@@ -59,11 +92,7 @@ async function main() {
       name: 'Head Chef Rajesh',
       phone: '+91 9876543211',
       role: 'CHEF',
-      chef: {
-        create: {
-          chefIdStr: 'CHEF-001'
-        }
-      }
+      chef: { create: { chefIdStr: 'CHEF-001' } }
     }
   });
 
@@ -75,17 +104,13 @@ async function main() {
       name: 'Mess Manager Suresh',
       phone: '+91 9876543212',
       role: 'ADMIN',
-      admin: {
-        create: {
-          adminIdStr: 'ADM-001'
-        }
-      }
+      admin: { create: { adminIdStr: 'ADM-001' } }
     }
   });
 
   console.log('✅ Created primary demo accounts (student@vit.edu, chef@vit.edu, admin@vit.edu)');
 
-  // 2. Create Additional Students (20+)
+  // 3. Create Additional Students (20+)
   const studentNames = [
     'Aarav Patel', 'Ananya Gupta', 'Rohan Verma', 'Isha Reddy', 'Siddharth Rao',
     'Priya Nair', 'Vikram Singh', 'Kavya Joshi', 'Aditya Kumar', 'Neha Sharma',
@@ -93,8 +118,7 @@ async function main() {
     'Meera Iyer', 'Arjun Saxena', 'Pooja Bhat', 'Manish Chawla', 'Divya Pillai'
   ];
 
-  const studentsList = [];
-  studentsList.push(demoStudentUser.student);
+  const studentsList = [demoStudentUser.student];
 
   for (let i = 0; i < studentNames.length; i++) {
     const studentUser = await prisma.user.create({
@@ -116,6 +140,12 @@ async function main() {
                 remainingCredit: 9000 - Math.floor(Math.random() * 3000),
                 monthYear: currentMonth
               }
+            },
+            studentMealPlans: {
+              create: {
+                mealPlanId: defaultMealPlan.id,
+                status: 'ACTIVE'
+              }
             }
           }
         }
@@ -124,9 +154,9 @@ async function main() {
     });
     studentsList.push(studentUser.student);
   }
-  console.log(`✅ Seeded ${studentsList.length} total students with credit accounts.`);
+  console.log(`✅ Seeded ${studentsList.length} total students with credit accounts and meal plans.`);
 
-  // 3. Create Additional Chefs & Admins
+  // 4. Create Chefs & Admins
   const chefNames = ['Chef Kumar', 'Chef Anthony', 'Chef Usman', 'Chef Murugan'];
   for (let i = 0; i < chefNames.length; i++) {
     await prisma.user.create({
@@ -152,7 +182,7 @@ async function main() {
     }
   });
 
-  // 4. Create 25+ Realistic Indian Mess Menu Items
+  // 5. Create Realistic Indian Mess Menu Items
   const menuItemsData = [
     // Breakfast
     {
@@ -191,25 +221,6 @@ async function main() {
       imageUrl: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80',
       isAvailable: true
     },
-    {
-      name: 'Puri Sambar Bhaji (4 pcs)',
-      description: 'Golden deep-fried puffy bread served with spicy potato curry.',
-      category: 'Breakfast',
-      price: 55,
-      availableQuantity: 0, // Sold out item test
-      imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&auto=format&fit=crop&q=80',
-      isAvailable: false
-    },
-    {
-      name: 'Meda Vada with Sambar (2 pcs)',
-      description: 'Crispy savory fried lentil donuts served with tangy sambar.',
-      category: 'Breakfast',
-      price: 45,
-      availableQuantity: 40,
-      imageUrl: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
-    },
-
     // Lunch
     {
       name: 'Special North Indian Veg Thali',
@@ -247,16 +258,6 @@ async function main() {
       imageUrl: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=600&auto=format&fit=crop&q=80',
       isAvailable: true
     },
-    {
-      name: 'Whole Wheat Chapati Basket (4 pcs)',
-      description: 'Freshly baked soft whole wheat chapatis with pure ghee topping.',
-      category: 'Lunch',
-      price: 30,
-      availableQuantity: 120,
-      imageUrl: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
-    },
-
     // Dinner
     {
       name: 'Hyderabadi Veg Dum Biryani',
@@ -285,25 +286,6 @@ async function main() {
       imageUrl: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80',
       isAvailable: true
     },
-    {
-      name: 'Egg Curry Rice Bowl',
-      description: '2 boiled eggs simmered in onion-tomato gravy served over steamed rice.',
-      category: 'Dinner',
-      price: 95,
-      availableQuantity: 45,
-      imageUrl: 'https://images.unsplash.com/photo-1617093727343-374698b1b08d?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
-    },
-    {
-      name: 'Chana Masala with Kulcha (2 pcs)',
-      description: 'Spiced chickpeas cooked in Punjabi gravy served with soft tandoori kulchas.',
-      category: 'Dinner',
-      price: 100,
-      availableQuantity: 60,
-      imageUrl: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
-    },
-
     // Beverages
     {
       name: 'Masala Chai',
@@ -315,15 +297,6 @@ async function main() {
       isAvailable: true
     },
     {
-      name: 'South Indian Filter Coffee',
-      description: 'Strong hot coffee frothed with boiling milk in traditional brass decoction filter.',
-      category: 'Beverages',
-      price: 25,
-      availableQuantity: 120,
-      imageUrl: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
-    },
-    {
       name: 'Chilled Sweet Lassi',
       description: 'Thick creamy yogurt beverage flavored with cardamom and saffron.',
       category: 'Beverages',
@@ -332,25 +305,6 @@ async function main() {
       imageUrl: 'https://images.unsplash.com/photo-1571006682860-39686411516e?w=600&auto=format&fit=crop&q=80',
       isAvailable: true
     },
-    {
-      name: 'Fresh Mango Milkshake',
-      description: 'Real Alphonso mango pulp blended with chilled milk and ice cream.',
-      category: 'Beverages',
-      price: 50,
-      availableQuantity: 40,
-      imageUrl: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
-    },
-    {
-      name: 'Spiced Buttermilk (Chaas)',
-      description: 'Refreshing churned curd with coriander, green chillies, and roasted cumin.',
-      category: 'Beverages',
-      price: 20,
-      availableQuantity: 100,
-      imageUrl: 'https://images.unsplash.com/photo-1541658016709-82535e94bc69?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
-    },
-
     // Snacks
     {
       name: 'Crispy Samosa (2 pcs)',
@@ -369,33 +323,6 @@ async function main() {
       availableQuantity: 45,
       imageUrl: 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&auto=format&fit=crop&q=80',
       isAvailable: true
-    },
-    {
-      name: 'Veg Cheese Grilled Sandwich',
-      description: 'Toasted bread loaded with sliced cucumber, tomato, cheese, and mint chutney.',
-      category: 'Snacks',
-      price: 60,
-      availableQuantity: 55,
-      imageUrl: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
-    },
-    {
-      name: 'French Fries with Dip',
-      description: 'Crispy salted potato fries served with tomato ketchup and garlic mayo.',
-      category: 'Snacks',
-      price: 50,
-      availableQuantity: 80,
-      imageUrl: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
-    },
-    {
-      name: 'Pav Bhaji Plate',
-      description: 'Spiced mashed vegetable curry garnished with butter, served with 2 soft buttered pavs.',
-      category: 'Snacks',
-      price: 75,
-      availableQuantity: 40,
-      imageUrl: 'https://images.unsplash.com/photo-1626132647523-66f5bf380027?w=600&auto=format&fit=crop&q=80',
-      isAvailable: true
     }
   ];
 
@@ -404,144 +331,211 @@ async function main() {
     const created = await prisma.menuItem.create({ data: item });
     createdMenuItems.push(created);
   }
-  console.log(`✅ Created ${createdMenuItems.length} menu items across 5 categories.`);
+  console.log(`✅ Created ${createdMenuItems.length} menu items.`);
 
-  // 5. Seed Credit Transactions (Monthly Allocations)
+  // 6. Seed Meal Declarations (Today & Tomorrow)
+  const mealTypes = ['Breakfast', 'Lunch', 'Dinner'];
   for (const student of studentsList) {
-    await prisma.creditTransaction.create({
-      data: {
-        creditAccountId: student.creditAccount.id,
-        type: 'MONTHLY_ALLOCATION',
-        amount: 9000.0,
-        balanceAfter: 9000.0,
-        description: `Monthly Credit Grant for ${currentMonth}`,
-        createdAt: new Date(Date.now() - 25 * 86400 * 1000)
-      }
+    // Declarations for Today
+    await prisma.mealDeclaration.createMany({
+      data: [
+        { studentId: student.id, mealDate: todayStr, mealType: 'Breakfast', status: 'DECLARED' },
+        { studentId: student.id, mealDate: todayStr, mealType: 'Lunch', status: 'DECLARED' },
+        { studentId: student.id, mealDate: todayStr, mealType: 'Dinner', status: Math.random() > 0.3 ? 'DECLARED' : 'SKIPPED' }
+      ],
+      skipDuplicates: true
+    });
+
+    // Declarations for Tomorrow
+    await prisma.mealDeclaration.createMany({
+      data: [
+        { studentId: student.id, mealDate: tomorrowStr, mealType: 'Breakfast', status: 'DECLARED' },
+        { studentId: student.id, mealDate: tomorrowStr, mealType: 'Lunch', status: 'DECLARED' },
+        { studentId: student.id, mealDate: tomorrowStr, mealType: 'Dinner', status: Math.random() > 0.4 ? 'SKIPPED' : 'DECLARED' }
+      ],
+      skipDuplicates: true
     });
   }
+  console.log('✅ Seeded Meal Declarations for Today and Tomorrow.');
 
-  // 6. Seed Orders & Order Items & Order Payment/Refund Transactions (100+ Orders)
-  const statuses = ['COMPLETED', 'COMPLETED', 'COMPLETED', 'READY', 'PREPARING', 'ACCEPTED', 'PENDING', 'CANCELLED'];
+  // 7. Seed Meal Slots for Today & Tomorrow (Lunch 15-min intervals)
+  const timeRanges = [
+    { start: '12:30', end: '12:45' },
+    { start: '12:45', end: '1:00' },
+    { start: '1:00', end: '1:15' },
+    { start: '1:15', end: '1:30' }
+  ];
+
+  const createdTodaySlots = [];
+  for (const tr of timeRanges) {
+    const slot = await prisma.mealSlot.create({
+      data: {
+        mealType: 'Lunch',
+        slotDate: todayStr,
+        startTime: tr.start,
+        endTime: tr.end,
+        capacity: 50,
+        bookedCount: Math.floor(Math.random() * 35) + 10,
+        status: 'ACTIVE'
+      }
+    });
+    createdTodaySlots.push(slot);
+  }
+
+  // Book Demo Student into 1:00 - 1:15 PM slot for Lunch today
+  const demoSlot = createdTodaySlots[2];
+  const demoBooking = await prisma.slotBooking.create({
+    data: {
+      studentId: demoStudentUser.student.id,
+      slotId: demoSlot.id,
+      mealDate: todayStr,
+      status: 'BOOKED'
+    }
+  });
+
+  console.log('✅ Seeded Meal Slots & Slot Booking for demo student.');
+
+  // 8. Seed Orders, Collection Tokens, Feedbacks, and Transactions
+  const statuses = ['COLLECTED', 'COLLECTED', 'READY', 'PREPARING', 'ACCEPTED', 'PENDING', 'NO_SHOW', 'CANCELLED'];
   let orderCounter = 1001;
 
-  for (let i = 0; i < 110; i++) {
+  for (let i = 0; i < 50; i++) {
     const randomStudent = studentsList[i % studentsList.length];
-    const numItems = Math.floor(Math.random() * 3) + 1;
-    const selectedItems = [];
-    let totalCredits = 0;
-
-    for (let j = 0; j < numItems; j++) {
-      const item = createdMenuItems[(i * 3 + j) % createdMenuItems.length];
-      const qty = Math.floor(Math.random() * 2) + 1;
-      const subtotal = item.price * qty;
-      totalCredits += subtotal;
-      selectedItems.push({
-        menuItemId: item.id,
-        itemName: item.name,
-        itemPrice: item.price,
-        quantity: qty,
-        subtotal
-      });
-    }
-
+    const item = createdMenuItems[i % createdMenuItems.length];
     const orderStatus = statuses[i % statuses.length];
-    const orderDate = new Date(Date.now() - (110 - i) * 4 * 3600 * 1000); // Distributed over recent days
+    const orderDate = new Date(Date.now() - (50 - i) * 2 * 3600 * 1000);
 
-    const createdOrder = await prisma.order.create({
+    const orderNumber = `ORD-202608-${orderCounter++}`;
+    const order = await prisma.order.create({
       data: {
-        orderNumber: `ORD-202608-${orderCounter++}`,
+        orderNumber,
         studentId: randomStudent.id,
-        totalCredits,
+        totalCredits: item.price,
         status: orderStatus,
+        slotBookingId: demoBooking.id,
+        isEntitlementUsed: i % 2 === 0,
         createdAt: orderDate,
         updatedAt: orderDate,
         orderItems: {
-          create: selectedItems
+          create: [{
+            menuItemId: item.id,
+            itemName: item.name,
+            itemPrice: item.price,
+            quantity: 1,
+            subtotal: item.price
+          }]
         }
       }
     });
 
-    // Log corresponding credit transactions
-    if (orderStatus !== 'CANCELLED') {
-      const currentAccount = await prisma.creditAccount.findUnique({ where: { id: randomStudent.creditAccount.id } });
-      const newUsed = currentAccount.usedCredit + totalCredits;
-      const newRemaining = Math.max(0, currentAccount.remainingCredit - totalCredits);
-
-      await prisma.creditAccount.update({
-        where: { id: currentAccount.id },
-        data: { usedCredit: newUsed, remainingCredit: newRemaining }
-      });
-
-      await prisma.creditTransaction.create({
+    // Create CollectionToken for READY or COLLECTED orders
+    if (orderStatus === 'READY' || orderStatus === 'COLLECTED') {
+      await prisma.collectionToken.create({
         data: {
-          creditAccountId: currentAccount.id,
-          type: 'ORDER_PAYMENT',
-          amount: -totalCredits,
-          balanceAfter: newRemaining,
-          description: `Payment for Order #${createdOrder.orderNumber}`,
-          orderId: createdOrder.id,
-          createdAt: orderDate
-        }
-      });
-    } else {
-      // Seed a cancelled order with payment + refund transaction pair
-      await prisma.creditTransaction.create({
-        data: {
-          creditAccountId: randomStudent.creditAccount.id,
-          type: 'ORDER_PAYMENT',
-          amount: -totalCredits,
-          balanceAfter: randomStudent.creditAccount.remainingCredit - totalCredits,
-          description: `Payment for Order #${createdOrder.orderNumber}`,
-          orderId: createdOrder.id,
-          createdAt: orderDate
-        }
-      });
-
-      await prisma.creditTransaction.create({
-        data: {
-          creditAccountId: randomStudent.creditAccount.id,
-          type: 'REFUND',
-          amount: totalCredits,
-          balanceAfter: randomStudent.creditAccount.remainingCredit,
-          description: `Refund for Cancelled Order #${createdOrder.orderNumber}`,
-          orderId: createdOrder.id,
-          createdAt: new Date(orderDate.getTime() + 15 * 60 * 1000)
+          orderId: order.id,
+          token: `QR-TOK-${Math.floor(100000 + Math.random() * 900000)}`,
+          expiresAt: new Date(Date.now() + 2 * 3600 * 1000),
+          usedAt: orderStatus === 'COLLECTED' ? new Date(orderDate.getTime() + 20 * 60 * 1000) : null,
+          status: orderStatus === 'COLLECTED' ? 'USED' : 'ACTIVE'
         }
       });
     }
+
+    // Create MealFeedback for COLLECTED orders
+    if (orderStatus === 'COLLECTED' && i % 3 === 0) {
+      const feedback = await prisma.mealFeedback.create({
+        data: {
+          studentId: randomStudent.id,
+          orderId: order.id,
+          foodQualityRating: Math.floor(Math.random() * 2) + 4,
+          quantityRating: 4,
+          temperatureRating: Math.floor(Math.random() * 3) + 3,
+          issues: i % 6 === 0 ? 'Too Cold' : null,
+          comment: 'Food was prepared well and served warm at counter!'
+        }
+      });
+
+      if (i % 6 === 0) {
+        await prisma.complaint.create({
+          data: {
+            studentId: randomStudent.id,
+            feedbackId: feedback.id,
+            issueType: 'Food Temperature',
+            description: 'Meal served was lukewarm during peak lunch hours.',
+            status: i % 2 === 0 ? 'OPEN' : 'RESOLVED',
+            resolutionNote: i % 2 === 0 ? null : 'Kitchen heating trays adjusted by Head Chef.'
+          }
+        });
+      }
+    }
   }
 
-  console.log('✅ Seeded 110+ orders and 200+ credit transaction records.');
+  console.log('✅ Seeded Orders, Collection Tokens, Meal Feedbacks & Complaints.');
 
-  // 7. Seed Notifications
+  // 9. Seed Weekend Special Menu Poll
+  const poll = await prisma.menuPoll.create({
+    data: {
+      title: 'Weekend Special Dish Selection',
+      description: 'Vote for your preferred dish for this Sunday institutional special lunch!',
+      startTime: new Date(),
+      endTime: new Date(Date.now() + 3 * 86400 * 1000),
+      status: 'ACTIVE'
+    }
+  });
+
+  const pollOption1 = await prisma.menuPollOption.create({
+    data: { pollId: poll.id, optionName: 'Special Hyderabadi Chicken Biryani' }
+  });
+  const pollOption2 = await prisma.menuPollOption.create({
+    data: { pollId: poll.id, optionName: 'Paneer Butter Masala with Garlic Naan' }
+  });
+  const pollOption3 = await prisma.menuPollOption.create({
+    data: { pollId: poll.id, optionName: 'Amritsari Chole Bhature' }
+  });
+
+  // Cast sample votes
+  for (let i = 0; i < studentsList.length; i++) {
+    const option = [pollOption1, pollOption2, pollOption3][i % 3];
+    await prisma.menuVote.create({
+      data: {
+        pollId: poll.id,
+        optionId: option.id,
+        studentId: studentsList[i].id
+      }
+    });
+  }
+
+  console.log('✅ Seeded Menu Poll and Votes.');
+
+  // 10. Seed System Notifications
   const demoStudentUserRecord = await prisma.user.findUnique({ where: { email: 'student@vit.edu' } });
   await prisma.notification.createMany({
     data: [
       {
         userId: demoStudentUserRecord.id,
-        title: 'Order Status Update',
-        message: 'Your order #ORD-202608-1001 has been marked as READY for pickup at Counter 2!',
-        type: 'ORDER_UPDATE',
+        title: 'Tomorrow Meal Declaration Open',
+        message: 'Plan tomorrow’s meals before 11:00 AM cutoff to assist mess kitchen preparation.',
+        type: 'MEAL_DECLARATION',
         isRead: false
       },
       {
         userId: demoStudentUserRecord.id,
-        title: 'Monthly Credit Refresh',
-        message: '9000 credits allocated for the month of August 2026.',
-        type: 'CREDIT_ALERT',
+        title: 'Lunch Pickup Slot Confirmed',
+        message: 'Your pickup slot for Lunch is booked for 1:00 PM – 1:15 PM today.',
+        type: 'SLOT_BOOKED',
         isRead: true
       },
       {
         userId: demoStudentUserRecord.id,
-        title: 'Welcome to Smart Mess System',
-        message: 'Your account is active. Order your meal token-free!',
-        type: 'GENERAL',
-        isRead: true
+        title: 'Order Status Update',
+        message: 'Your meal order #ORD-202608-1003 is READY! Show your QR code at Counter 1.',
+        type: 'ORDER_UPDATE',
+        isRead: false
       }
     ]
   });
 
-  console.log('🎉 Database seeding completed successfully!');
+  console.log('🎉 Full database seeding completed successfully!');
 }
 
 main()

@@ -1,7 +1,9 @@
 import prisma from '../utils/prisma.js';
 import { createNotification } from './notificationService.js';
+import { checkAndConsumeEntitlement } from './entitlementService.js';
+import { getOrCreateCollectionToken } from './collectionService.js';
 
-export const createOrderTransaction = async ({ studentId, items }) => {
+export const createOrderTransaction = async ({ studentId, items, slotBookingId, mealType }) => {
   if (!items || !Array.isArray(items) || items.length === 0) {
     throw new Error('Order cart cannot be empty');
   }
@@ -9,7 +11,6 @@ export const createOrderTransaction = async ({ studentId, items }) => {
   let studentUserId = null;
   let totalOrderCredits = 0;
 
-  // Execute inside a single PostgreSQL / SQLite Prisma transaction with 15s timeout
   const order = await prisma.$transaction(async (tx) => {
     // 1. Fetch Student & Credit Account
     const student = await tx.student.findUnique({
@@ -56,23 +57,43 @@ export const createOrderTransaction = async ({ studentId, items }) => {
       });
     }
 
-    // 3. Check Student Remaining Credits
-    if (creditAccount.remainingCredit < totalOrderCredits) {
-      throw new Error(`Insufficient credits. Required: ${totalOrderCredits} credits, Available: ${creditAccount.remainingCredit} credits.`);
+    // 3. Entitlement Validation Engine
+    const targetMealType = mealType || (validatedItems[0]?.menuItem?.category) || 'Lunch';
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const existingStandard = await tx.mealEntitlementUsage.findFirst({
+      where: {
+        studentId: student.id,
+        usageDate: todayStr,
+        mealType: targetMealType,
+        usageType: 'STANDARD'
+      }
+    });
+
+    const isEntitlementUsed = !existingStandard; // True if standard meal entitlement covers this
+
+    // If standard entitlement is used for standard meal, zero out the required credits deduction
+    const finalChargedCredits = isEntitlementUsed ? 0 : totalOrderCredits;
+
+    // 4. Check Remaining Credits if charged
+    if (finalChargedCredits > 0 && creditAccount.remainingCredit < finalChargedCredits) {
+      throw new Error(`Insufficient credits. Required: ${finalChargedCredits} credits, Available: ${creditAccount.remainingCredit} credits.`);
     }
 
-    // 4. Generate Unique Order Number
+    // 5. Generate Unique Order Number
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const orderNumber = `ORD-${dateStr}-${randomSuffix}`;
 
-    // 5. Create Order & OrderItems
+    // 6. Create Order & OrderItems
     const orderRecord = await tx.order.create({
       data: {
         orderNumber,
         studentId: student.id,
         totalCredits: totalOrderCredits,
         status: 'PENDING',
+        slotBookingId: slotBookingId || null,
+        isEntitlementUsed,
         orderItems: {
           create: validatedItems.map((v) => ({
             menuItemId: v.menuItem.id,
@@ -83,12 +104,21 @@ export const createOrderTransaction = async ({ studentId, items }) => {
           }))
         }
       },
-      include: {
-        orderItems: true
+      include: { orderItems: true }
+    });
+
+    // 7. Record Entitlement Usage Audit
+    await tx.mealEntitlementUsage.create({
+      data: {
+        studentId: student.id,
+        usageDate: todayStr,
+        mealType: targetMealType,
+        orderId: orderRecord.id,
+        usageType: isEntitlementUsed ? 'STANDARD' : 'EXTRA'
       }
     });
 
-    // 6. Update Menu Item Stock Quantities & Auto-Disable if 0
+    // 8. Update Menu Stock Quantities
     for (const v of validatedItems) {
       const newQty = v.menuItem.availableQuantity - v.quantity;
       await tx.menuItem.update({
@@ -100,41 +130,42 @@ export const createOrderTransaction = async ({ studentId, items }) => {
       });
     }
 
-    // 7. Deduct Student Credits
-    const newUsedCredit = creditAccount.usedCredit + totalOrderCredits;
-    const newRemainingCredit = creditAccount.remainingCredit - totalOrderCredits;
+    // 9. Deduct Credits if applicable
+    if (finalChargedCredits > 0) {
+      const newUsedCredit = creditAccount.usedCredit + finalChargedCredits;
+      const newRemainingCredit = creditAccount.remainingCredit - finalChargedCredits;
 
-    await tx.creditAccount.update({
-      where: { id: creditAccount.id },
-      data: {
-        usedCredit: newUsedCredit,
-        remainingCredit: newRemainingCredit
-      }
-    });
+      await tx.creditAccount.update({
+        where: { id: creditAccount.id },
+        data: {
+          usedCredit: newUsedCredit,
+          remainingCredit: newRemainingCredit
+        }
+      });
 
-    // 8. Log Credit Transaction Record
-    await tx.creditTransaction.create({
-      data: {
-        creditAccountId: creditAccount.id,
-        type: 'ORDER_PAYMENT',
-        amount: -totalOrderCredits,
-        balanceAfter: newRemainingCredit,
-        description: `Payment for Order #${orderRecord.orderNumber}`,
-        orderId: orderRecord.id
-      }
-    });
+      await tx.creditTransaction.create({
+        data: {
+          creditAccountId: creditAccount.id,
+          type: 'ORDER_PAYMENT',
+          amount: -finalChargedCredits,
+          balanceAfter: newRemainingCredit,
+          description: `Payment for Extra Meal Order #${orderRecord.orderNumber}`,
+          orderId: orderRecord.id
+        }
+      });
+    }
 
     return orderRecord;
   }, { timeout: 15000 });
 
-  // 9. Send Notification to Student AFTER transaction has committed safely
+  // 10. Send Notification
   if (studentUserId && order) {
     createNotification({
       userId: studentUserId,
       title: 'Order Placed Successfully',
-      message: `Your order #${order.orderNumber} for ${totalOrderCredits} credits has been received by the kitchen.`,
+      message: `Your order #${order.orderNumber} has been received by the mess kitchen.`,
       type: 'ORDER_UPDATE'
-    }).catch(err => console.error('Failed to create order notification:', err));
+    }).catch(err => console.error('Notification error:', err));
   }
 
   return order;
@@ -168,7 +199,7 @@ export const cancelOrderTransaction = async ({ orderId, studentId }) => {
 
     studentUserId = order.student.userId;
     orderNumberStr = order.orderNumber;
-    refundedCredits = order.totalCredits;
+    refundedCredits = order.isEntitlementUsed ? 0 : order.totalCredits;
 
     // 1. Update Order Status
     const result = await tx.order.update({
@@ -191,49 +222,49 @@ export const cancelOrderTransaction = async ({ orderId, studentId }) => {
       }
     }
 
-    // 3. Refund Credits
-    const creditAccount = order.student.creditAccount;
-    const newUsedCredit = Math.max(0, creditAccount.usedCredit - order.totalCredits);
-    const newRemainingCredit = creditAccount.remainingCredit + order.totalCredits;
+    // 3. Refund Credits if charged
+    if (refundedCredits > 0) {
+      const creditAccount = order.student.creditAccount;
+      const newUsedCredit = Math.max(0, creditAccount.usedCredit - refundedCredits);
+      const newRemainingCredit = creditAccount.remainingCredit + refundedCredits;
 
-    await tx.creditAccount.update({
-      where: { id: creditAccount.id },
-      data: {
-        usedCredit: newUsedCredit,
-        remainingCredit: newRemainingCredit
-      }
-    });
+      await tx.creditAccount.update({
+        where: { id: creditAccount.id },
+        data: {
+          usedCredit: newUsedCredit,
+          remainingCredit: newRemainingCredit
+        }
+      });
 
-    // 4. Log Refund Transaction Record
-    await tx.creditTransaction.create({
-      data: {
-        creditAccountId: creditAccount.id,
-        type: 'REFUND',
-        amount: order.totalCredits,
-        balanceAfter: newRemainingCredit,
-        description: `Refund for Cancelled Order #${order.orderNumber}`,
-        orderId: order.id
-      }
-    });
+      await tx.creditTransaction.create({
+        data: {
+          creditAccountId: creditAccount.id,
+          type: 'REFUND',
+          amount: refundedCredits,
+          balanceAfter: newRemainingCredit,
+          description: `Refund for Cancelled Order #${order.orderNumber}`,
+          orderId: order.id
+        }
+      });
+    }
 
     return result;
   }, { timeout: 15000 });
 
-  // 5. Notify Student AFTER transaction has committed safely
   if (studentUserId && updatedOrder) {
     createNotification({
       userId: studentUserId,
-      title: 'Order Cancelled & Refunded',
-      message: `Order #${orderNumberStr} cancelled. ${refundedCredits} credits refunded to your wallet.`,
+      title: 'Order Cancelled',
+      message: `Order #${orderNumberStr} cancelled. ${refundedCredits > 0 ? `${refundedCredits} credits refunded.` : 'Daily entitlement restored.'}`,
       type: 'REFUND'
-    }).catch(err => console.error('Failed to create refund notification:', err));
+    }).catch(err => console.error('Notification error:', err));
   }
 
   return updatedOrder;
 };
 
 export const updateOrderStatusChef = async (orderId, newStatus) => {
-  const allowedStatuses = ['ACCEPTED', 'PREPARING', 'READY', 'COMPLETED', 'CANCELLED'];
+  const allowedStatuses = ['ACCEPTED', 'PREPARING', 'READY', 'COLLECTED', 'NO_SHOW', 'CANCELLED'];
   if (!allowedStatuses.includes(newStatus)) {
     throw new Error(`Invalid order status transition to ${newStatus}`);
   }
@@ -244,12 +275,18 @@ export const updateOrderStatusChef = async (orderId, newStatus) => {
     include: { student: { include: { user: true } }, orderItems: true }
   });
 
+  // Auto-generate QR Collection Token when READY
+  if (newStatus === 'READY') {
+    await getOrCreateCollectionToken(order.id, order.studentId).catch(err => console.error('Token gen error:', err));
+  }
+
   if (order?.student?.userId) {
     const statusMessages = {
       ACCEPTED: `Chef accepted your order #${order.orderNumber}.`,
       PREPARING: `Kitchen is now preparing your food for #${order.orderNumber}.`,
-      READY: `Order #${order.orderNumber} is READY! Pick it up at Mess Counter.`,
-      COMPLETED: `Order #${order.orderNumber} marked as completed. Enjoy your meal!`
+      READY: `Order #${order.orderNumber} is READY! View your QR Code for collection.`,
+      COLLECTED: `Order #${order.orderNumber} marked as collected. Enjoy your meal!`,
+      NO_SHOW: `Order #${order.orderNumber} was marked as NO_SHOW (collection deadline passed).`
     };
 
     if (statusMessages[newStatus]) {
@@ -257,11 +294,10 @@ export const updateOrderStatusChef = async (orderId, newStatus) => {
         userId: order.student.userId,
         title: `Order Status: ${newStatus}`,
         message: statusMessages[newStatus],
-        type: 'ORDER_UPDATE'
+        type: newStatus === 'NO_SHOW' ? 'NO_SHOW' : 'ORDER_UPDATE'
       }).catch(err => console.error('Notification error:', err));
     }
   }
 
   return order;
 };
-
