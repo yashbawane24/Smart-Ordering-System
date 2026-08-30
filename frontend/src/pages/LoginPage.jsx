@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Flame, ArrowRight, AlertCircle, KeyRound, Mail, Sparkles, UserCheck } from 'lucide-react';
+import { Flame, ArrowRight, AlertCircle, KeyRound, Mail, Sparkles } from 'lucide-react';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const LoginPage = () => {
-  const [email, setEmail] = useState('student@vit.edu');
-  const [password, setPassword] = useState('Password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeRole, setActiveRole] = useState('STUDENT');
@@ -16,23 +16,6 @@ export const LoginPage = () => {
 
   const handleRoleSelect = (role) => {
     setActiveRole(role);
-    setError('');
-    if (role === 'STUDENT') {
-      setEmail('student@vit.edu');
-      setPassword('Password123');
-    } else if (role === 'CHEF') {
-      setEmail('chef@vit.edu');
-      setPassword('Password123');
-    } else if (role === 'ADMIN') {
-      setEmail('admin@vit.edu');
-      setPassword('Password123');
-    }
-  };
-
-  const handleQuickDemo = (demoEmail, demoPassword, role) => {
-    setActiveRole(role);
-    setEmail(demoEmail);
-    setPassword(demoPassword);
     setError('');
   };
 
@@ -68,11 +51,11 @@ export const LoginPage = () => {
           <p className="text-[11px] font-black tracking-widest text-[#E50914] uppercase flex items-center justify-center gap-1 pt-1">
             <Sparkles className="w-3.5 h-3.5 text-[#E50914]" /> MESS MANAGEMENT PORTAL
           </p>
-          <h2 className="text-lg font-extrabold text-white tracking-tight pt-1">Sign In to Account</h2>
+          <h2 className="text-lg font-extrabold text-white tracking-tight pt-1">Sign In to Your Account</h2>
         </div>
 
         {/* Role Selector Tabs */}
-        <div className="grid grid-cols-3 gap-1 p-1 bg-[#1C1C1C] rounded-full border border-[#242424] mb-4">
+        <div className="grid grid-cols-3 gap-1 p-1 bg-[#1C1C1C] rounded-full border border-[#242424] mb-6">
           {['STUDENT', 'CHEF', 'ADMIN'].map((role) => (
             <button
               key={role}
@@ -87,34 +70,6 @@ export const LoginPage = () => {
               {role}
             </button>
           ))}
-        </div>
-
-        {/* Quick Demo Credentials Autofill Banner */}
-        <div className="bg-[#1C1C1C] border border-[#242424] p-3 rounded-2xl mb-5 text-center space-y-2">
-          <span className="text-[10px] font-mono text-[#A3A3A3] uppercase block font-bold">Quick Demo Login</span>
-          <div className="grid grid-cols-3 gap-1.5">
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('student@vit.edu', 'Password123', 'STUDENT')}
-              className="py-1.5 px-2 bg-[#242424] hover:bg-[#E50914] text-white text-[10px] font-black rounded-xl transition border border-[#333333]"
-            >
-              Student
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('chef@vit.edu', 'Password123', 'CHEF')}
-              className="py-1.5 px-2 bg-[#242424] hover:bg-[#E50914] text-white text-[10px] font-black rounded-xl transition border border-[#333333]"
-            >
-              Chef
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('admin@vit.edu', 'Password123', 'ADMIN')}
-              className="py-1.5 px-2 bg-[#242424] hover:bg-[#E50914] text-white text-[10px] font-black rounded-xl transition border border-[#333333]"
-            >
-              Admin
-            </button>
-          </div>
         </div>
 
         {/* Error Alert */}
@@ -136,8 +91,8 @@ export const LoginPage = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] transition placeholder:text-[#666666]"
-                placeholder="student@vit.edu"
+                className="w-full pl-11 pr-4 py-3.5 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] transition placeholder:text-[#666666]"
+                placeholder="Enter registered email address"
               />
             </div>
           </div>
@@ -151,8 +106,8 @@ export const LoginPage = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] transition placeholder:text-[#666666]"
-                placeholder="••••••••"
+                className="w-full pl-11 pr-4 py-3.5 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] transition placeholder:text-[#666666]"
+                placeholder="Enter your password"
               />
             </div>
           </div>
@@ -177,7 +132,7 @@ export const LoginPage = () => {
         </form>
 
         {/* Registration Link */}
-        <div className="mt-6 pt-5 border-t border-[#242424] text-center">
+        <div className="mt-8 pt-6 border-t border-[#242424] text-center">
           <p className="text-xs font-bold text-[#8E8E93]">
             Don't have an account?{' '}
             <Link to="/register" className="text-[#E50914] hover:underline font-black">

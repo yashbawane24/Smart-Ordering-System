@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Flame, User, Mail, Lock, Phone, Home, Hash, ArrowRight } from 'lucide-react';
+import { Flame, User, Mail, Lock, Phone, Home, Hash, ArrowRight, Sparkles } from 'lucide-react';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const SignupPage = () => {
@@ -35,7 +35,7 @@ export const SignupPage = () => {
         else navigate('/admin');
       }
     } catch (err) {
-      setError(err.message || 'Registration failed. Please try again.');
+      setError(err.message || 'Registration failed. Please check credentials and try again.');
     } finally {
       setLoading(false);
     }
@@ -43,26 +43,26 @@ export const SignupPage = () => {
 
   return (
     <div className="min-h-screen bg-reference-outer flex items-center justify-center p-4 font-sans relative overflow-hidden">
-      <div className="w-full max-w-md bg-[#1A1A1A] border border-[#2B2B2B] rounded-[32px] p-6 sm:p-8 shadow-2xl space-y-6 relative z-10">
+      <div className="w-full max-w-md bg-[#151515] border border-[#242424] rounded-[32px] p-6 sm:p-8 shadow-2xl space-y-6 relative z-10">
         
         {/* Brand Header */}
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF3B30] via-[#E62E00] to-[#FF9500] text-white flex items-center justify-center shadow-xl shadow-[#FF3B30]/30 transform rotate-[-6deg]">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#E50914] to-[#B91C1C] text-white flex items-center justify-center shadow-xl shadow-[#E50914]/30 transform rotate-[-6deg]">
               <Flame className="w-7 h-7 fill-white" />
             </div>
           </Link>
-          <h1 className="text-2xl font-black text-white tracking-tight">Create Official Account</h1>
-          <p className="text-xs font-extrabold text-[#FF3B30]">Smart Digital Mess & Credit Allowance Portal</p>
+          <h1 className="text-2xl font-extrabold text-white tracking-tight">Create Campus Account</h1>
+          <p className="text-xs font-black tracking-widest text-[#E50914] uppercase">Smart Mess Operations & Meal Allowance</p>
         </div>
 
-        {/* Role Selector Segmented Pill Control */}
-        <div className="flex bg-[#272727] p-1 rounded-full border border-[#333333]">
+        {/* Role Selector Segmented Control */}
+        <div className="flex bg-[#1C1C1C] p-1 rounded-full border border-[#242424]">
           <button
             type="button"
             onClick={() => setRole('STUDENT')}
             className={`flex-1 py-2 text-xs font-black rounded-full transition-all duration-300 ${
-              role === 'STUDENT' ? 'bg-[#FF3B30] text-white shadow-lg' : 'text-[#8E8E93] hover:text-white'
+              role === 'STUDENT' ? 'bg-[#E50914] text-white shadow-lg' : 'text-[#8E8E93] hover:text-white'
             }`}
           >
             Student
@@ -71,7 +71,7 @@ export const SignupPage = () => {
             type="button"
             onClick={() => setRole('CHEF')}
             className={`flex-1 py-2 text-xs font-black rounded-full transition-all duration-300 ${
-              role === 'CHEF' ? 'bg-[#FF3B30] text-white shadow-lg' : 'text-[#8E8E93] hover:text-white'
+              role === 'CHEF' ? 'bg-[#E50914] text-white shadow-lg' : 'text-[#8E8E93] hover:text-white'
             }`}
           >
             Chef Staff
@@ -80,7 +80,7 @@ export const SignupPage = () => {
             type="button"
             onClick={() => setRole('ADMIN')}
             className={`flex-1 py-2 text-xs font-black rounded-full transition-all duration-300 ${
-              role === 'ADMIN' ? 'bg-[#FF3B30] text-white shadow-lg' : 'text-[#8E8E93] hover:text-white'
+              role === 'ADMIN' ? 'bg-[#E50914] text-white shadow-lg' : 'text-[#8E8E93] hover:text-white'
             }`}
           >
             Admin
@@ -88,7 +88,7 @@ export const SignupPage = () => {
         </div>
 
         {error && (
-          <div className="p-3.5 bg-[#3D0A0A] border border-[#7F1D1D] text-[#FF4D4D] text-xs font-bold rounded-2xl text-center">
+          <div className="p-3.5 bg-[#450A0A] border border-[#E50914] text-[#F87171] text-xs font-bold rounded-2xl text-center">
             {error}
           </div>
         )}
@@ -104,22 +104,22 @@ export const SignupPage = () => {
                 placeholder="Aarav Sharma"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full pl-11 pr-4 py-3 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
+                className="w-full pl-11 pr-4 py-3 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] placeholder-[#666666]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] font-black text-[#8E8E93] uppercase tracking-widest mb-1">College Email Address</label>
+            <label className="block text-[10px] font-black text-[#8E8E93] uppercase tracking-widest mb-1">Email Address</label>
             <div className="relative">
               <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
               <input
                 type="email"
                 required
-                placeholder="student@college.edu.in"
+                placeholder="aarav@college.edu.in"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-11 pr-4 py-3 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
+                className="w-full pl-11 pr-4 py-3 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] placeholder-[#666666]"
               />
             </div>
           </div>
@@ -134,7 +134,7 @@ export const SignupPage = () => {
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-11 pr-4 py-3 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
+                className="w-full pl-11 pr-4 py-3 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] placeholder-[#666666]"
               />
             </div>
           </div>
@@ -151,13 +151,13 @@ export const SignupPage = () => {
                       placeholder="23BCE1042"
                       value={formData.studentIdStr}
                       onChange={(e) => setFormData({ ...formData, studentIdStr: e.target.value })}
-                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
+                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] placeholder-[#666666]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-[#8E8E93] uppercase tracking-widest mb-1">Phone Number (+91)</label>
+                  <label className="block text-[10px] font-black text-[#8E8E93] uppercase tracking-widest mb-1">Phone Number</label>
                   <div className="relative">
                     <Phone className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#8E8E93]" />
                     <input
@@ -165,7 +165,7 @@ export const SignupPage = () => {
                       placeholder="+91 98765 43210"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
+                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] placeholder-[#666666]"
                     />
                   </div>
                 </div>
@@ -179,14 +179,13 @@ export const SignupPage = () => {
                     <select
                       value={formData.hostel}
                       onChange={(e) => setFormData({ ...formData, hostel: e.target.value })}
-                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] appearance-none"
+                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] appearance-none"
                     >
                       <option value="MH-A (Mens Hostel Block A)">MH-A (Mens Hostel Block A)</option>
                       <option value="MH-B (Mens Hostel Block B)">MH-B (Mens Hostel Block B)</option>
                       <option value="MH-C (Mens Hostel Block C)">MH-C (Mens Hostel Block C)</option>
                       <option value="LH-1 (Ladies Hostel Block 1)">LH-1 (Ladies Hostel Block 1)</option>
                       <option value="LH-2 (Ladies Hostel Block 2)">LH-2 (Ladies Hostel Block 2)</option>
-                      <option value="SJT Mess Hostel">SJT Mess Hostel</option>
                     </select>
                   </div>
                 </div>
@@ -198,26 +197,25 @@ export const SignupPage = () => {
                     placeholder="A-304"
                     value={formData.roomNumber}
                     onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
-                    className="w-full px-4 py-2.5 text-xs bg-[#222222] text-white border border-[#2D2D2D] rounded-full focus:outline-none focus:border-[#FF3B30] placeholder-[#666666]"
+                    className="w-full px-4 py-2.5 text-xs bg-[#1C1C1C] text-white border border-[#242424] rounded-full focus:outline-none focus:border-[#E50914] placeholder-[#666666]"
                   />
                 </div>
               </div>
 
-              <div className="p-3 bg-[#062D15] border border-[#166534] rounded-2xl text-[11px] font-bold text-[#4ADE80] flex items-center gap-2">
-                <span>🎁 New student registrations receive ₹9,000 Monthly Mess Credit Allowance!</span>
+              <div className="p-3 bg-[#22C55E]/10 border border-[#22C55E]/30 rounded-2xl text-[11px] font-bold text-[#22C55E] text-center">
+                🎁 New student accounts receive 9,000 Monthly Mess Credit Allowance!
               </div>
             </>
           )}
 
-
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 text-xs font-black uppercase tracking-wider text-white bg-gradient-to-r from-[#FF3B30] to-[#D32F2F] hover:brightness-110 disabled:opacity-50 rounded-full transition-all duration-300 shadow-xl shadow-[#FF3B30]/30 flex items-center justify-center gap-2"
+            className="w-full py-3.5 px-4 text-xs font-black uppercase tracking-wider text-white bg-[#E50914] hover:bg-[#B91C1C] disabled:opacity-50 rounded-full transition-all duration-300 shadow-xl shadow-[#E50914]/20 flex items-center justify-center gap-2"
           >
             {loading ? <LoadingSpinner size="sm" className="border-white border-t-transparent" /> : (
               <>
-                <span>CREATE OFFICIAL ACCOUNT</span>
+                <span>CREATE ACCOUNT</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -227,7 +225,7 @@ export const SignupPage = () => {
         <div className="text-center pt-2">
           <p className="text-xs font-bold text-[#8E8E93]">
             Already have an account?{' '}
-            <Link to="/login" className="text-[#FF3B30] hover:underline font-black">
+            <Link to="/login" className="text-[#E50914] hover:underline font-black">
               Sign In Here →
             </Link>
           </p>

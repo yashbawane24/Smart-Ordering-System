@@ -74,7 +74,7 @@ export const register = async (req, res, next) => {
         await tx.chef.create({
           data: {
             userId: createdUser.id,
-            kitchenSection: 'Main Kitchen Counter',
+            chefIdStr: `CHEF-${Math.floor(1000 + Math.random() * 9000)}`,
             isActive: true
           }
         });
@@ -82,7 +82,7 @@ export const register = async (req, res, next) => {
         await tx.admin.create({
           data: {
             userId: createdUser.id,
-            permissions: 'FULL'
+            adminIdStr: `ADM-${Math.floor(1000 + Math.random() * 9000)}`
           }
         });
       }
@@ -126,12 +126,12 @@ export const login = async (req, res, next) => {
     });
 
     if (!user) {
-      return errorResponse(res, 401, 'Invalid credentials');
+      return errorResponse(res, 401, 'Invalid email or password credentials');
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return errorResponse(res, 401, 'Invalid credentials');
+      return errorResponse(res, 401, 'Invalid email or password credentials');
     }
 
     // Check account status if student or chef
@@ -181,4 +181,3 @@ export const getCurrentUser = async (req, res, next) => {
 export const logout = async (req, res) => {
   return successResponse(res, 200, 'Logout successful');
 };
-
