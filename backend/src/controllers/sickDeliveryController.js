@@ -1,3 +1,4 @@
+import prisma from '../utils/prisma.js';
 import { successResponse, errorResponse } from '../utils/response.js';
 import {
   createSickDeliveryRequest,
@@ -93,7 +94,9 @@ export const checkMyAccess = async (req, res, next) => {
     const { mealType, date } = req.query;
     
     // Fetch student ID from user
-    const student = await req.student || await import('../utils/prisma.js').then(p => p.default.student.findUnique({ where: { userId: req.user.id } }));
+    const student = await prisma.student.findUnique({
+      where: { userId: req.user.id }
+    });
     
     if (!student) {
       return errorResponse(res, 404, 'Student account not found');

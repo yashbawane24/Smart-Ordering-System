@@ -330,8 +330,8 @@ export const checkSickDeliveryAccess = async ({ studentId, mealType, targetDate 
       allowedMeals: matchingApproval.allowedMeals,
       maxDeliveriesPerDay: matchingApproval.maxDeliveriesPerDay,
       deliveriesUsedToday: deliveriesTodayCount,
-      roomNumber: matchingApproval.request.roomNumber,
-      hostel: matchingApproval.request.hostel
+      roomNumber: matchingApproval.request?.roomNumber || 'N/A',
+      hostel: matchingApproval.request?.hostel || 'Main Campus Hostel'
     }
   };
 };
