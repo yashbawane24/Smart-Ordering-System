@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
-import { Calendar, Clock, CheckCircle2, XCircle, AlertCircle, Sparkles } from 'lucide-react';
+import { Calendar, Clock, CheckCircle2, XCircle, AlertCircle, Sparkles, HeartPulse } from 'lucide-react';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner.jsx';
+import { StudentSickDeliveryTab } from '../../components/student/StudentSickDeliveryTab.jsx';
 
 export const MyMealsPage = () => {
   const [activeTab, setActiveTab] = useState('tomorrow');
@@ -88,19 +89,19 @@ export const MyMealsPage = () => {
           <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
             <span>MY MEALS</span>
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#E50914]/20 text-[#E50914] border border-[#E50914]/30 uppercase font-mono">
-              Advance Declaration
+              Institutional Meal Management
             </span>
           </h1>
           <p className="text-sm text-[#A3A3A3] mt-1">
-            Plan your upcoming meals to help the kitchen estimate demand and reduce food waste.
+            Plan upcoming meal participation or request warden-approved sick meal delivery.
           </p>
         </div>
 
-        {/* Date Selector Tabs */}
-        <div className="flex items-center bg-[#151515] p-1 rounded-2xl border border-[#242424]">
+        {/* Date / Sick Delivery Selector Tabs */}
+        <div className="flex items-center bg-[#151515] p-1 rounded-2xl border border-[#242424] overflow-x-auto">
           <button
             onClick={() => setActiveTab('today')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition ${
+            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap ${
               activeTab === 'today'
                 ? 'bg-[#242424] text-white shadow-md'
                 : 'text-[#A3A3A3] hover:text-white'
@@ -110,7 +111,7 @@ export const MyMealsPage = () => {
           </button>
           <button
             onClick={() => setActiveTab('tomorrow')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition ${
+            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition whitespace-nowrap ${
               activeTab === 'tomorrow'
                 ? 'bg-[#E50914] text-white shadow-md'
                 : 'text-[#A3A3A3] hover:text-white'
@@ -118,8 +119,24 @@ export const MyMealsPage = () => {
           >
             Tomorrow ({data?.tomorrow}) ★
           </button>
+          <button
+            onClick={() => setActiveTab('sick_delivery')}
+            className={`px-3.5 py-2 text-xs font-bold rounded-xl transition flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === 'sick_delivery'
+                ? 'bg-[#E50914] text-white shadow-md'
+                : 'text-[#A3A3A3] hover:text-white'
+            }`}
+          >
+            <HeartPulse className="w-3.5 h-3.5" />
+            <span>Sick Meal Delivery</span>
+          </button>
         </div>
       </div>
+
+      {activeTab === 'sick_delivery' ? (
+        <StudentSickDeliveryTab />
+      ) : (
+        <>
 
       {msg && (
         <div
@@ -229,6 +246,8 @@ export const MyMealsPage = () => {
           );
         })}
       </div>
+      </>
+      )}
     </div>
   );
 };

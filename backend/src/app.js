@@ -20,6 +20,8 @@ import demandRoutes from './routes/demandRoutes.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import feedbackRoutes from './routes/feedbackRoutes.js';
 import pollRoutes from './routes/pollRoutes.js';
+import sickDeliveryRoutes from './routes/sickDeliveryRoutes.js';
+import sustainabilityRoutes from './routes/sustainabilityRoutes.js';
 
 import { errorHandler } from './middlewares/errorHandler.js';
 
@@ -66,6 +68,10 @@ app.use('/api/demand', demandRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/polls', pollRoutes);
+
+// Sick Meal Delivery & Public Sustainability Routes
+app.use('/api/sick-delivery', sickDeliveryRoutes);
+app.use('/api/sustainability', sustainabilityRoutes);
 
 // 404 Handler
 app.use((req, res) => {

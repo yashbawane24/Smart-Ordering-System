@@ -3,18 +3,29 @@ import { motion } from 'framer-motion';
 import { Clock, CheckCircle2, Utensils, ShoppingBag, XCircle, Check } from 'lucide-react';
 import { formatCredits, formatDate } from '../../utils/formatters';
 
-const STAGES = [
+const PICKUP_STAGES = [
   { key: 'PENDING', label: 'Order Placed', icon: Clock },
   { key: 'ACCEPTED', label: 'Accepted by Kitchen', icon: CheckCircle2 },
   { key: 'PREPARING', label: 'Preparing Food', icon: Utensils },
   { key: 'READY', label: 'Ready for Pickup', icon: ShoppingBag },
-  { key: 'COMPLETED', label: 'Order Completed', icon: CheckCircle2 }
+  { key: 'COLLECTED', label: 'Order Collected', icon: CheckCircle2 }
+];
+
+const DELIVERY_STAGES = [
+  { key: 'PENDING', label: 'Order Placed', icon: Clock },
+  { key: 'ACCEPTED', label: 'Accepted by Kitchen', icon: CheckCircle2 },
+  { key: 'PREPARING', label: 'Preparing Food', icon: Utensils },
+  { key: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', icon: ShoppingBag },
+  { key: 'DELIVERED', label: 'Delivered to Room', icon: CheckCircle2 }
 ];
 
 export const OrderProgressWidget = ({ order, onCancel }) => {
   if (!order) return null;
 
-  const currentStageIndex = STAGES.findIndex(s => s.key === order.status);
+  const isSickDelivery = order.fulfillmentType === 'SICK_DELIVERY';
+  const STAGES = isSickDelivery ? DELIVERY_STAGES : PICKUP_STAGES;
+
+  const currentStageIndex = STAGES.findIndex(s => s.key === order.status || s.key === order.deliveryStatus);
   const isCancelled = order.status === 'CANCELLED';
 
   return (
@@ -22,8 +33,19 @@ export const OrderProgressWidget = ({ order, onCancel }) => {
       {/* Order Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#1F1F1F] gap-3">
         <div>
-          <span className="text-[10px] text-[#737373] font-black uppercase tracking-widest block">ACTIVE TRACKING</span>
-          <h3 className="text-xl font-black text-white font-mono tracking-tight">{order.orderNumber}</h3>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-[#737373] font-black uppercase tracking-widest block">ACTIVE TRACKING</span>
+            {isSickDelivery ? (
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/30 font-bold uppercase">
+                ✓ Sick Delivery Approved ({order.deliveryHostel} {order.deliveryRoomNumber})
+              </span>
+            ) : (
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#242424] text-[#A3A3A3] font-bold uppercase">
+                Counter Pickup
+              </span>
+            )}
+          </div>
+          <h3 className="text-xl font-black text-white font-mono tracking-tight mt-1">{order.orderNumber}</h3>
           <p className="text-xs text-[#888888] mt-0.5">{formatDate(order.createdAt)}</p>
         </div>
         <div className="flex items-center gap-3">

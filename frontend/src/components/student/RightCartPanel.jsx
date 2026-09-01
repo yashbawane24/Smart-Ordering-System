@@ -11,14 +11,27 @@ export const RightCartPanel = ({ onOrderPlaced }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [orderType, setOrderType] = useState('DELIVERY'); // 'DELIVERY', 'DINE_IN', 'TAKEAWAY'
+  const [fulfillmentType, setFulfillmentType] = useState('PICKUP'); // 'PICKUP', 'SICK_DELIVERY'
+  const [sickAccess, setSickAccess] = useState(null);
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  const deliveryFee = orderType === 'DELIVERY' ? 10 : 0;
+  useEffect(() => {
+    const checkAccess = async () => {
+      try {
+        const res = await api.get('/sick-delivery/access/me');
+        setSickAccess(res.data);
+      } catch (err) {
+        console.error('Error checking sick delivery access', err);
+      }
+    };
+    checkAccess();
+  }, []);
+
+  const deliveryFee = fulfillmentType === 'SICK_DELIVERY' ? 0 : 0;
   const grandTotal = totalCredits + deliveryFee;
 
   const handleApplyPromo = (e) => {
@@ -40,12 +53,13 @@ export const RightCartPanel = ({ onOrderPlaced }) => {
 
       const res = await api.post('/orders', {
         items: orderItems,
-        orderType: orderType,
-        notes: `Placed via Dashboard (${orderType})`
+        fulfillmentType: fulfillmentType,
+        deliveryRoomNumber: user?.student?.roomNumber || 'A-304',
+        deliveryHostel: user?.student?.hostel || 'Block A, Mens Hostel'
       });
 
       if (res.success) {
-        setSuccessMsg('Order placed successfully!');
+        setSuccessMsg(fulfillmentType === 'SICK_DELIVERY' ? 'Sick Delivery Order Placed!' : 'Order placed successfully!');
         clearCart();
         if (onOrderPlaced) onOrderPlaced();
         setTimeout(() => {
@@ -92,41 +106,55 @@ export const RightCartPanel = ({ onOrderPlaced }) => {
           </span>
         </div>
 
-        {/* Segmented Control (Mess Hall / Hostel Parcel / Counter Pickup) */}
-        <div className="grid grid-cols-3 gap-1 p-1 bg-[#1A1A1A] rounded-full border border-[#2D2D2D]">
-          <button
-            type="button"
-            onClick={() => setOrderType('DINE_IN')}
-            className={`py-2 text-[10px] font-extrabold rounded-full transition-all duration-300 ${
-              orderType === 'DINE_IN'
-                ? 'btn-red-pill text-white'
-                : 'text-[#8E8E93] hover:text-white'
-            }`}
-          >
-            Mess Hall
-          </button>
-          <button
-            type="button"
-            onClick={() => setOrderType('DELIVERY')}
-            className={`py-2 text-[10px] font-extrabold rounded-full transition-all duration-300 ${
-              orderType === 'DELIVERY'
-                ? 'btn-red-pill text-white'
-                : 'text-[#8E8E93] hover:text-white'
-            }`}
-          >
-            Hostel Parcel
-          </button>
-          <button
-            type="button"
-            onClick={() => setOrderType('TAKEAWAY')}
-            className={`py-2 text-[10px] font-extrabold rounded-full transition-all duration-300 ${
-              orderType === 'TAKEAWAY'
-                ? 'btn-red-pill text-white'
-                : 'text-[#8E8E93] hover:text-white'
-            }`}
-          >
-            Counter Pickup
-          </button>
+        {/* Fulfillment Method Selection */}
+        <div className="space-y-1.5">
+          <label className="text-[10px] font-black text-[#8E8E93] uppercase tracking-widest block">
+            FULFILLMENT METHOD
+          </label>
+          <div className="grid grid-cols-2 gap-1.5 p-1 bg-[#1A1A1A] rounded-2xl border border-[#2D2D2D]">
+            <button
+              type="button"
+              onClick={() => setFulfillmentType('PICKUP')}
+              className={`py-2 text-[10px] font-extrabold rounded-xl transition-all duration-300 ${
+                fulfillmentType === 'PICKUP'
+                  ? 'btn-red-pill text-white'
+                  : 'text-[#8E8E93] hover:text-white'
+              }`}
+            >
+              Pickup
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (sickAccess?.isUnlocked) {
+                  setFulfillmentType('SICK_DELIVERY');
+                } else {
+                  navigate('/student/meals');
+                }
+              }}
+              className={`py-2 text-[10px] font-extrabold rounded-xl transition-all duration-300 flex items-center justify-center gap-1 ${
+                fulfillmentType === 'SICK_DELIVERY'
+                  ? 'bg-[#22C55E] text-white shadow-md'
+                  : sickAccess?.isUnlocked
+                  ? 'text-[#22C55E] border border-[#22C55E]/40 hover:bg-[#22C55E]/10'
+                  : 'text-[#8E8E93] opacity-75 hover:text-white'
+              }`}
+            >
+              {sickAccess?.isUnlocked ? (
+                <span>✓ Sick Delivery</span>
+              ) : (
+                <span>🔒 Approval Required</span>
+              )}
+            </button>
+          </div>
+
+          {sickAccess?.isUnlocked && (
+            <div className="p-2 bg-[#22C55E]/10 border border-[#22C55E]/30 rounded-xl text-[10px] text-[#22C55E] font-bold flex items-center justify-between">
+              <span>✓ Sick Delivery Access Approved</span>
+              <span className="text-[#8E8E93]">Valid until: {new Date(sickAccess.approval?.approvalEndDate).toLocaleDateString()}</span>
+            </div>
+          )}
         </div>
 
 

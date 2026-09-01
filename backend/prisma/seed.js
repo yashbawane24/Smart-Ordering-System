@@ -7,6 +7,10 @@ async function main() {
   console.log('🌱 Starting database seeding for Smart Campus Mess Operations...');
 
   // Clean existing data in reverse dependency order
+  await prisma.sustainabilityDailyMetric.deleteMany();
+  await prisma.sustainabilityConfig.deleteMany();
+  await prisma.deliveryAccessApproval.deleteMany();
+  await prisma.sickDeliveryRequest.deleteMany();
   await prisma.menuVote.deleteMany();
   await prisma.menuPollOption.deleteMany();
   await prisma.menuPoll.deleteMany();
@@ -28,6 +32,7 @@ async function main() {
   await prisma.student.deleteMany();
   await prisma.chef.deleteMany();
   await prisma.admin.deleteMany();
+  await prisma.warden.deleteMany();
   await prisma.user.deleteMany();
 
   console.log('🧹 Cleaned up old database records.');
@@ -108,7 +113,19 @@ async function main() {
     }
   });
 
-  console.log('✅ Created primary demo accounts (student@vit.edu, chef@vit.edu, admin@vit.edu)');
+  // Demo Warden
+  const demoWardenUser = await prisma.user.create({
+    data: {
+      email: 'warden@vit.edu',
+      password: hashedPassword,
+      name: 'Warden Dr. Ramesh Kumar',
+      phone: '+91 9876543213',
+      role: 'WARDEN',
+      warden: { create: { wardenIdStr: 'WDN-001', hostel: 'Block A, Mens Hostel' } }
+    }
+  });
+
+  console.log('✅ Created primary demo accounts (student@vit.edu, chef@vit.edu, admin@vit.edu, warden@vit.edu)');
 
   // 3. Create Additional Students (20+)
   const studentNames = [
@@ -534,6 +551,152 @@ async function main() {
       }
     ]
   });
+
+  // 11. Seed Sick Delivery Requests & Approvals
+  const student2 = studentsList[1]; // Aarav Patel
+  const student3 = studentsList[2]; // Ananya Gupta
+
+  // Pending Sick Delivery Request for Student 2
+  await prisma.sickDeliveryRequest.create({
+    data: {
+      studentId: student2.id,
+      roomNumber: 'A-201',
+      hostel: 'Block A, Mens Hostel',
+      reason: 'High fever and severe weakness under doctor prescribed room rest.',
+      requestedStartDate: new Date(Date.now()),
+      requestedEndDate: new Date(Date.now() + 3 * 86400 * 1000),
+      requestedMeals: 'Breakfast,Lunch,Dinner',
+      status: 'PENDING_WARDEN_APPROVAL'
+    }
+  });
+
+  // Approved Sick Delivery Request for Student 3
+  const approvedReq = await prisma.sickDeliveryRequest.create({
+    data: {
+      studentId: student3.id,
+      roomNumber: 'B-104',
+      hostel: 'Block B, Mens Hostel',
+      reason: 'Sprained ankle injury during sports event. Crutches advised for 4 days.',
+      requestedStartDate: new Date(Date.now() - 86400 * 1000),
+      requestedEndDate: new Date(Date.now() + 4 * 86400 * 1000),
+      requestedMeals: 'Lunch,Dinner',
+      status: 'APPROVED',
+      reviewedAt: new Date(Date.now() - 86400 * 1000),
+      reviewedBy: demoWardenUser.id
+    }
+  });
+
+  await prisma.deliveryAccessApproval.create({
+    data: {
+      requestId: approvedReq.id,
+      studentId: student3.id,
+      approvedBy: demoWardenUser.id,
+      approvalStartDate: new Date(Date.now() - 86400 * 1000),
+      approvalEndDate: new Date(Date.now() + 4 * 86400 * 1000),
+      allowedMeals: 'Lunch,Dinner',
+      maxDeliveriesPerDay: 2,
+      status: 'ACTIVE',
+      expiresAt: new Date(Date.now() + 4 * 86400 * 1000)
+    }
+  });
+
+  console.log('✅ Seeded Sick Delivery Requests & Approvals.');
+
+  // 12. Seed Sustainability Config & 30 Days Daily Metrics
+  const defaultConfig = await prisma.sustainabilityConfig.create({
+    data: {
+      baselineMethod: 'HISTORICAL_BASELINE',
+      historicalParticipationRate: 0.75,
+      averageMealEquivalentKg: 0.45,
+      breakfastCutoff: '22:00',
+      lunchCutoff: '09:00',
+      dinnerCutoff: '15:00',
+      calculationVersion: 'v1.0',
+      isActive: true,
+      updatedBy: demoAdminUser.id
+    }
+  });
+
+  // Seed 30 days of metrics
+  const totalEligible = 500;
+  const histRate = 0.75; // Baseline preparation = 375 meals per day
+  const avgKg = 0.45;
+
+  let cumulativeAvoided = 0;
+  for (let d = 30; d >= 0; d--) {
+    const mDate = new Date(Date.now() - d * 86400 * 1000).toISOString().split('T')[0];
+    
+    // Random variations for breakfast, lunch, dinner
+    const meals = ['Breakfast', 'Lunch', 'Dinner'];
+    let dayAvoided = 0;
+
+    for (const meal of meals) {
+      const declared = Math.floor(300 + Math.random() * 50); // e.g. 320
+      const skipped = Math.floor(60 + Math.random() * 40);   // e.g. 80
+      const baselinePrep = Math.floor(totalEligible * histRate / 3); // 125 per meal
+      const demandInformedPrep = Math.floor(declared + (totalEligible/3 - declared - skipped) * histRate);
+      const mealsAvoided = Math.max(baselinePrep - demandInformedPrep + Math.floor(skipped * 0.5), 15 + Math.floor(Math.random() * 25));
+      const foodKg = parseFloat((mealsAvoided * avgKg).toFixed(2));
+      dayAvoided += mealsAvoided;
+
+      await prisma.sustainabilityDailyMetric.upsert({
+        where: { metricDate_mealType: { metricDate: mDate, mealType: meal } },
+        update: {
+          eligibleStudents: Math.floor(totalEligible / 3),
+          declaredStudents: declared,
+          skippedBeforeCutoff: skipped,
+          preparationBaseline: baselinePrep,
+          demandInformedPreparation: demandInformedPrep,
+          estimatedMealsAvoided: mealsAvoided,
+          estimatedFoodEquivalentKg: foodKg
+        },
+        create: {
+          metricDate: mDate,
+          mealType: meal,
+          eligibleStudents: Math.floor(totalEligible / 3),
+          declaredStudents: declared,
+          skippedBeforeCutoff: skipped,
+          preparationBaseline: baselinePrep,
+          demandInformedPreparation: demandInformedPrep,
+          estimatedMealsAvoided: mealsAvoided,
+          estimatedFoodEquivalentKg: foodKg,
+          calculationVersion: 'v1.0'
+        }
+      });
+    }
+
+    // Also store daily summary ALL
+    const summaryAvoided = dayAvoided;
+    const summaryKg = parseFloat((summaryAvoided * avgKg).toFixed(2));
+    cumulativeAvoided += summaryAvoided;
+
+    await prisma.sustainabilityDailyMetric.upsert({
+      where: { metricDate_mealType: { metricDate: mDate, mealType: 'ALL' } },
+      update: {
+        eligibleStudents: totalEligible,
+        declaredStudents: 950,
+        skippedBeforeCutoff: 210,
+        preparationBaseline: 375,
+        demandInformedPreparation: 375 - summaryAvoided,
+        estimatedMealsAvoided: summaryAvoided,
+        estimatedFoodEquivalentKg: summaryKg
+      },
+      create: {
+        metricDate: mDate,
+        mealType: 'ALL',
+        eligibleStudents: totalEligible,
+        declaredStudents: 950,
+        skippedBeforeCutoff: 210,
+        preparationBaseline: 375,
+        demandInformedPreparation: 375 - summaryAvoided,
+        estimatedMealsAvoided: summaryAvoided,
+        estimatedFoodEquivalentKg: summaryKg,
+        calculationVersion: 'v1.0'
+      }
+    });
+  }
+
+  console.log(`✅ Seeded 30 days of Sustainability Daily Metrics (${cumulativeAvoided} total avoided meals).`);
 
   console.log('🎉 Full database seeding completed successfully!');
 }

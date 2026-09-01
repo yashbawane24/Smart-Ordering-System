@@ -21,7 +21,9 @@ import {
   TrendingUp,
   Vote,
   Layers,
-  PieChart
+  Leaf,
+  HeartPulse,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -43,6 +45,11 @@ export const Sidebar = ({ isOpen, onClose }) => {
           { label: 'Menu Polls', path: '/student/polls', icon: Vote },
           { label: 'Profile', path: '/student/profile', icon: User },
         ];
+      case 'WARDEN':
+        return [
+          { label: 'Dashboard', path: '/warden', icon: LayoutDashboard },
+          { label: 'Delivery Requests', path: '/warden/requests', icon: HeartPulse },
+        ];
       case 'CHEF':
         return [
           { label: 'Dashboard', path: '/chef', icon: LayoutDashboard },
@@ -62,6 +69,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
           { label: 'Meal Slots', path: '/admin/slots', icon: Layers },
           { label: 'Demand Planning', path: '/admin/demand', icon: TrendingUp },
           { label: 'Analytics', path: '/admin/analytics', icon: PieChart },
+          { label: 'Sustainability', path: '/admin/sustainability', icon: Leaf },
           { label: 'Feedback', path: '/admin/feedback', icon: MessageSquare },
           { label: 'Menu Polls', path: '/admin/polls', icon: Vote },
           { label: 'Credits', path: '/admin/credits', icon: User },

@@ -15,14 +15,21 @@ export const OrderKanbanCard = ({ order, onUpdateStatus }) => {
       {/* Order Header */}
       <div className="flex justify-between items-start">
         <div>
-          <span className="text-xs font-mono font-black text-white block">
-            #{order.orderNumber}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono font-black text-white block">
+              #{order.orderNumber}
+            </span>
+            {order.fulfillmentType === 'SICK_DELIVERY' && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#22C55E]/20 text-[#22C55E] border border-[#22C55E]/40 font-extrabold uppercase">
+                Sick Delivery
+              </span>
+            )}
+          </div>
           <h4 className="text-sm font-black text-white mt-0.5">
             {order.student?.user?.name || 'Student'}
           </h4>
           <span className="text-[11px] text-[#8E8E93] font-semibold block">
-            {order.student?.studentIdStr} • {order.student?.hostel || 'Hostel'}
+            {order.student?.studentIdStr} • {order.fulfillmentType === 'SICK_DELIVERY' ? `Room ${order.deliveryRoomNumber} (${order.deliveryHostel})` : (order.student?.hostel || 'Hostel')}
           </span>
         </div>
         <div className="text-right">
@@ -90,21 +97,32 @@ export const OrderKanbanCard = ({ order, onUpdateStatus }) => {
           {order.status === 'PREPARING' && (
             <button
               type="button"
-              onClick={() => onUpdateStatus(order.id, 'READY')}
+              onClick={() => onUpdateStatus(order.id, order.fulfillmentType === 'SICK_DELIVERY' ? 'OUT_FOR_DELIVERY' : 'READY')}
               className="btn-red-pill px-4 py-2 text-xs font-black uppercase text-white tracking-wider flex items-center gap-1"
             >
-              <span>MARK READY</span>
+              <span>{order.fulfillmentType === 'SICK_DELIVERY' ? 'OUT FOR DELIVERY' : 'MARK READY'}</span>
               <Check className="w-3.5 h-3.5" />
             </button>
           )}
 
-          {order.status === 'READY' && (
+          {order.status === 'OUT_FOR_DELIVERY' && (
             <button
               type="button"
-              onClick={() => onUpdateStatus(order.id, 'COMPLETED')}
+              onClick={() => onUpdateStatus(order.id, 'DELIVERED')}
               className="px-4 py-2 text-xs font-black text-white bg-[#22C55E] hover:bg-[#16a34a] rounded-full transition flex items-center gap-1 shadow-lg"
             >
-              <span>COMPLETE</span>
+              <span>MARK DELIVERED</span>
+              <Check className="w-3.5 h-3.5" />
+            </button>
+          )}
+
+          {(order.status === 'READY' || order.status === 'DELIVERED') && (
+            <button
+              type="button"
+              onClick={() => onUpdateStatus(order.id, 'COLLECTED')}
+              className="px-4 py-2 text-xs font-black text-white bg-[#22C55E] hover:bg-[#16a34a] rounded-full transition flex items-center gap-1 shadow-lg"
+            >
+              <span>{order.status === 'DELIVERED' ? 'DELIVERED ✓' : 'COMPLETE'}</span>
               <Check className="w-3.5 h-3.5" />
             </button>
           )}

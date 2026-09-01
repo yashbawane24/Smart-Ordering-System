@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Sun, Moon, Bell, LogOut, Menu, Flame } from 'lucide-react';
+import { Sun, Moon, Bell, LogOut, Menu, Flame, Leaf } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { NotificationCenter } from '../student/NotificationCenter';
+import { Link } from 'react-router-dom';
 
 export const Navbar = ({ onToggleSidebar }) => {
   const { user, logout } = useAuth();
@@ -38,6 +39,14 @@ export const Navbar = ({ onToggleSidebar }) => {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-3">
+        {/* Public Sustainability Link Button */}
+        <Link
+          to="/sustainability"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-[#10B981]/15 hover:bg-[#10B981]/25 text-[#10B981] border border-[#10B981]/30 rounded-full text-xs font-bold transition"
+        >
+          <Leaf className="w-3.5 h-3.5" />
+          <span>Sustainability Impact</span>
+        </Link>
         {/* Dark / Light Theme Toggle */}
         <button
           onClick={toggleTheme}

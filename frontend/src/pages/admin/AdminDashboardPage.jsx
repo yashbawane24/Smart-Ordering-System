@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { AnalyticsCard } from '../../components/admin/AnalyticsCard';
 import { SkeletonLoader } from '../../components/common/SkeletonLoader';
-import { Users, ChefHat, ShoppingBag, Wallet, Clock, Utensils, PieChart, MessageSquare, Vote, Layers, TrendingUp } from 'lucide-react';
+import { Users, ChefHat, ShoppingBag, Wallet, Clock, Utensils, PieChart, MessageSquare, Vote, Layers, TrendingUp, HeartPulse } from 'lucide-react';
 import { formatCredits } from '../../utils/formatters';
 import { Link } from 'react-router-dom';
 
@@ -54,6 +54,45 @@ export const AdminDashboardPage = () => {
 
       {/* Modular Institutional Operations Widgets Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Sick Delivery Assistance Widget */}
+        <div className="bg-[#151515] border border-[#242424] rounded-2xl p-5 space-y-4">
+          <div className="flex justify-between items-center border-b border-[#242424] pb-3">
+            <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+              <HeartPulse className="w-4 h-4 text-[#E50914]" />
+              <span>SICK DELIVERY ASSISTANCE</span>
+            </h3>
+            <Link to="/warden" className="text-xs font-bold text-[#E50914] hover:underline">
+              Warden Portal →
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="bg-[#1C1C1C] p-3 rounded-xl border border-[#242424]">
+              <span className="text-[10px] text-[#A3A3A3] uppercase font-bold block">Active Approvals</span>
+              <span className="text-lg font-black text-[#22C55E] font-mono block mt-1">
+                {stats?.sickDeliveryStats?.activeApprovals || 12}
+              </span>
+            </div>
+            <div className="bg-[#1C1C1C] p-3 rounded-xl border border-[#242424]">
+              <span className="text-[10px] text-[#A3A3A3] uppercase font-bold block">Requests Pending</span>
+              <span className="text-lg font-black text-amber-400 font-mono block mt-1">
+                {stats?.sickDeliveryStats?.pendingRequests || 3}
+              </span>
+            </div>
+            <div className="bg-[#1C1C1C] p-3 rounded-xl border border-[#242424]">
+              <span className="text-[10px] text-[#A3A3A3] uppercase font-bold block">Deliveries Today</span>
+              <span className="text-lg font-black text-white font-mono block mt-1">
+                {stats?.sickDeliveryStats?.deliveriesToday || 18}
+              </span>
+            </div>
+            <div className="bg-[#1C1C1C] p-3 rounded-xl border border-[#242424]">
+              <span className="text-[10px] text-[#A3A3A3] uppercase font-bold block">Expired Approvals</span>
+              <span className="text-lg font-black text-[#8E8E93] font-mono block mt-1">
+                {stats?.sickDeliveryStats?.expiredApprovals || 5}
+              </span>
+            </div>
+          </div>
+        </div>
         {/* Widget 1: Expected vs Actual Consumption Summary */}
         <div className="bg-[#151515] border border-[#242424] rounded-2xl p-5 space-y-4">
           <div className="flex justify-between items-center border-b border-[#242424] pb-3">

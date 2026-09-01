@@ -13,8 +13,16 @@ export const placeOrder = async (req, res, next) => {
       return errorResponse(res, 404, 'Student account not found');
     }
 
-    const { items } = req.body;
-    const order = await createOrderTransaction({ studentId: student.id, items });
+    const { items, slotBookingId, mealType, fulfillmentType, deliveryRoomNumber, deliveryHostel } = req.body;
+    const order = await createOrderTransaction({
+      studentId: student.id,
+      items,
+      slotBookingId,
+      mealType,
+      fulfillmentType,
+      deliveryRoomNumber,
+      deliveryHostel
+    });
 
     return successResponse(res, 201, 'Order placed successfully', order);
   } catch (error) {

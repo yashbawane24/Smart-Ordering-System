@@ -28,13 +28,36 @@ export const getAdminDashboardStats = async (req, res, next) => {
       _sum: { totalCredits: true }
     });
 
+    // Sick Delivery Assistance Stats
+    const activeSickApprovals = await prisma.deliveryAccessApproval.count({
+      where: { status: 'ACTIVE' }
+    });
+    const pendingSickRequests = await prisma.sickDeliveryRequest.count({
+      where: { status: 'PENDING_WARDEN_APPROVAL' }
+    });
+    const sickDeliveriesToday = await prisma.order.count({
+      where: {
+        fulfillmentType: 'SICK_DELIVERY',
+        createdAt: { gte: today }
+      }
+    });
+    const expiredSickApprovals = await prisma.sickDeliveryRequest.count({
+      where: { status: { in: ['EXPIRED', 'REJECTED'] } }
+    });
+
     return successResponse(res, 200, 'Admin dashboard statistics retrieved', {
       totalStudents,
       totalChefs,
       ordersToday,
       pendingOrders,
       availableMenuItems,
-      revenueInCredits: aggregateRevenue._sum.totalCredits || 0
+      revenueInCredits: aggregateRevenue._sum.totalCredits || 0,
+      sickDeliveryStats: {
+        activeApprovals: activeSickApprovals,
+        pendingRequests: pendingSickRequests,
+        deliveriesToday: sickDeliveriesToday,
+        expiredApprovals: expiredSickApprovals
+      }
     });
   } catch (error) {
     next(error);

@@ -15,13 +15,14 @@ model User {
   password      String
   name          String
   phone         String?
-  role          String         @default("STUDENT") // STUDENT, CHEF, ADMIN
+  role          String         @default("STUDENT") // STUDENT, CHEF, ADMIN, WARDEN
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
   student       Student?
   chef          Chef?
   admin         Admin?
+  warden        Warden?
   notifications Notification[]
 }
 
@@ -36,15 +37,17 @@ model Student {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
-  creditAccount         CreditAccount?
-  studentMealPlans      StudentMealPlan[]
-  declarations          MealDeclaration[]
-  slotBookings          SlotBooking[]
-  entitlementUsages     MealEntitlementUsage[]
-  orders                Order[]
-  feedbacks             MealFeedback[]
-  complaints            Complaint[]
-  votes                 MenuVote[]
+  creditAccount            CreditAccount?
+  studentMealPlans         StudentMealPlan[]
+  declarations             MealDeclaration[]
+  slotBookings             SlotBooking[]
+  entitlementUsages        MealEntitlementUsage[]
+  orders                   Order[]
+  feedbacks                MealFeedback[]
+  complaints               Complaint[]
+  votes                    MenuVote[]
+  sickDeliveryRequests     SickDeliveryRequest[]
+  deliveryAccessApprovals  DeliveryAccessApproval[]
 }
 
 model Chef {
@@ -64,6 +67,16 @@ model Admin {
   adminIdStr String   @unique // e.g., ADM001
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model Warden {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wardenIdStr String   @unique // e.g., WDN001
+  hostel      String?  // e.g., Block A, Mens Hostel
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model CreditAccount {
@@ -115,6 +128,10 @@ model Order {
   student            Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
   totalCredits       Float
   status             String              @default("PENDING") // PENDING, ACCEPTED, PREPARING, READY, COLLECTED, NO_SHOW, CANCELLED
+  fulfillmentType    String              @default("PICKUP") // PICKUP, SICK_DELIVERY
+  deliveryStatus     String              @default("NOT_APPLICABLE") // NOT_APPLICABLE, PENDING, PREPARING, READY_FOR_DELIVERY, OUT_FOR_DELIVERY, DELIVERED
+  deliveryRoomNumber String?
+  deliveryHostel     String?
   slotBookingId      String?
   slotBooking        SlotBooking?        @relation(fields: [slotBookingId], references: [id], onDelete: SetNull)
   isEntitlementUsed  Boolean             @default(false)
@@ -311,3 +328,79 @@ model MenuVote {
 
   @@unique([pollId, studentId])
 }
+
+// ==========================================
+// SICK DELIVERY & SUSTAINABILITY MANAGEMENT
+// ==========================================
+
+model SickDeliveryRequest {
+  id                 String                  @id @default(uuid())
+  studentId          String
+  student            Student                 @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  roomNumber         String
+  hostel             String?
+  reason             String
+  requestedStartDate DateTime
+  requestedEndDate   DateTime
+  requestedMeals     String                  // Comma-separated: "Breakfast,Lunch,Dinner"
+  status             String                  @default("PENDING_WARDEN_APPROVAL") // PENDING_WARDEN_APPROVAL, APPROVED, REJECTED, EXPIRED, CANCELLED
+  submittedAt        DateTime                @default(now())
+  reviewedAt         DateTime?
+  reviewedBy         String?
+  rejectionReason    String?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  approval           DeliveryAccessApproval?
+}
+
+model DeliveryAccessApproval {
+  id                  String              @id @default(uuid())
+  requestId           String              @unique
+  request             SickDeliveryRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  studentId           String
+  student             Student             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  approvedBy          String              // Warden User ID
+  approvalStartDate   DateTime
+  approvalEndDate     DateTime
+  allowedMeals        String              // Comma-separated: "Breakfast,Lunch,Dinner"
+  maxDeliveriesPerDay Int                 @default(3)
+  status              String              @default("ACTIVE") // ACTIVE, EXPIRED, REVOKED
+  createdAt           DateTime            @default(now())
+  expiresAt           DateTime
+  updatedAt           DateTime            @updatedAt
+}
+
+model SustainabilityConfig {
+  id                          String   @id @default(uuid())
+  baselineMethod              String   @default("HISTORICAL_BASELINE")
+  historicalParticipationRate Float    @default(0.75)
+  averageMealEquivalentKg     Float    @default(0.45)
+  breakfastCutoff             String   @default("22:00")
+  lunchCutoff                 String   @default("09:00")
+  dinnerCutoff                String   @default("15:00")
+  calculationVersion          String   @default("v1.0")
+  isActive                    Boolean  @default(true)
+  updatedBy                   String?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+}
+
+model SustainabilityDailyMetric {
+  id                          String   @id @default(uuid())
+  metricDate                  String   // "YYYY-MM-DD"
+  mealType                    String   // "ALL", "Breakfast", "Lunch", "Dinner"
+  eligibleStudents            Int
+  declaredStudents            Int
+  skippedBeforeCutoff         Int
+  preparationBaseline         Int
+  demandInformedPreparation   Int
+  estimatedMealsAvoided       Int
+  estimatedFoodEquivalentKg   Float
+  calculationVersion          String   @default("v1.0")
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  @@unique([metricDate, mealType])
+}
+

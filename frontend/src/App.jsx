@@ -11,6 +11,7 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { PublicSustainabilityPage } from './pages/public/PublicSustainabilityPage';
 
 // Student Pages
 import { StudentDashboardPage } from './pages/student/StudentDashboardPage';
@@ -26,6 +27,9 @@ import { MealSlotsPage } from './pages/student/MealSlotsPage';
 import { QRCollectionPage } from './pages/student/QRCollectionPage';
 import { StudentFeedbackPage } from './pages/student/StudentFeedbackPage';
 import { StudentPollsPage } from './pages/student/StudentPollsPage';
+
+// Warden Pages
+import { WardenDashboardPage } from './pages/warden/WardenDashboardPage';
 
 // Chef Pages
 import { ChefDashboardPage } from './pages/chef/ChefDashboardPage';
@@ -49,6 +53,7 @@ import { AdminDemandPlanningPage } from './pages/admin/AdminDemandPlanningPage';
 import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage';
 import { AdminFeedbackPage } from './pages/admin/AdminFeedbackPage';
 import { AdminPollsPage } from './pages/admin/AdminPollsPage';
+import { AdminSustainabilityPage } from './pages/admin/AdminSustainabilityPage';
 
 import { LoadingSpinner } from './components/common/LoadingSpinner';
 
@@ -69,6 +74,7 @@ const ProtectedRoute = ({ allowedRoles, children }) => {
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     if (user.role === 'STUDENT') return <Navigate to="/student" replace />;
+    if (user.role === 'WARDEN') return <Navigate to="/warden" replace />;
     if (user.role === 'CHEF') return <Navigate to="/chef" replace />;
     if (user.role === 'ADMIN') return <Navigate to="/admin" replace />;
   }
@@ -84,6 +90,7 @@ export const App = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<SignupPage />} />
+        <Route path="/sustainability" element={<PublicSustainabilityPage />} />
       </Route>
 
       {/* Protected Student Portal */}
@@ -108,6 +115,19 @@ export const App = () => {
         <Route path="polls" element={<StudentPollsPage />} />
         <Route path="profile" element={<ProfilePage />} />
         <Route path="settings" element={<SettingsPage />} />
+      </Route>
+
+      {/* Protected Warden Portal */}
+      <Route
+        path="/warden"
+        element={
+          <ProtectedRoute allowedRoles={['WARDEN', 'ADMIN']}>
+            <MainLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<WardenDashboardPage />} />
+        <Route path="requests" element={<WardenDashboardPage />} />
       </Route>
 
       {/* Protected Chef Portal */}
@@ -172,6 +192,7 @@ export const App = () => {
         <Route path="slots" element={<AdminSlotsPage />} />
         <Route path="demand" element={<AdminDemandPlanningPage />} />
         <Route path="analytics" element={<AdminAnalyticsPage />} />
+        <Route path="sustainability" element={<AdminSustainabilityPage />} />
         <Route path="feedback" element={<AdminFeedbackPage />} />
         <Route path="polls" element={<AdminPollsPage />} />
         <Route path="credits" element={<CreditManagementPage />} />

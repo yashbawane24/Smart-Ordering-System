@@ -2,8 +2,17 @@ import prisma from '../utils/prisma.js';
 import { createNotification } from './notificationService.js';
 import { checkAndConsumeEntitlement } from './entitlementService.js';
 import { getOrCreateCollectionToken } from './collectionService.js';
+import { checkSickDeliveryAccess } from './sickDeliveryService.js';
 
-export const createOrderTransaction = async ({ studentId, items, slotBookingId, mealType }) => {
+export const createOrderTransaction = async ({
+  studentId,
+  items,
+  slotBookingId,
+  mealType,
+  fulfillmentType = 'PICKUP',
+  deliveryRoomNumber,
+  deliveryHostel
+}) => {
   if (!items || !Array.isArray(items) || items.length === 0) {
     throw new Error('Order cart cannot be empty');
   }
@@ -80,18 +89,45 @@ export const createOrderTransaction = async ({ studentId, items, slotBookingId, 
       throw new Error(`Insufficient credits. Required: ${finalChargedCredits} credits, Available: ${creditAccount.remainingCredit} credits.`);
     }
 
-    // 5. Generate Unique Order Number
+    // 5. Backend Authorization for Sick Delivery
+    let resolvedFulfillmentType = 'PICKUP';
+    let resolvedDeliveryStatus = 'NOT_APPLICABLE';
+    let resolvedRoomNumber = null;
+    let resolvedHostel = null;
+
+    if (fulfillmentType === 'SICK_DELIVERY') {
+      const accessCheck = await checkSickDeliveryAccess({
+        studentId: student.id,
+        mealType: targetMealType,
+        targetDate: new Date()
+      });
+
+      if (!accessCheck.isUnlocked) {
+        throw new Error(`Sick meal delivery access denied: ${accessCheck.reason}`);
+      }
+
+      resolvedFulfillmentType = 'SICK_DELIVERY';
+      resolvedDeliveryStatus = 'PENDING';
+      resolvedRoomNumber = deliveryRoomNumber || accessCheck.approval?.roomNumber || student.roomNumber || 'N/A';
+      resolvedHostel = deliveryHostel || accessCheck.approval?.hostel || student.hostel || 'Main Campus Hostel';
+    }
+
+    // 6. Generate Unique Order Number
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const orderNumber = `ORD-${dateStr}-${randomSuffix}`;
 
-    // 6. Create Order & OrderItems
+    // 7. Create Order & OrderItems
     const orderRecord = await tx.order.create({
       data: {
         orderNumber,
         studentId: student.id,
         totalCredits: totalOrderCredits,
         status: 'PENDING',
+        fulfillmentType: resolvedFulfillmentType,
+        deliveryStatus: resolvedDeliveryStatus,
+        deliveryRoomNumber: resolvedRoomNumber,
+        deliveryHostel: resolvedHostel,
         slotBookingId: slotBookingId || null,
         isEntitlementUsed,
         orderItems: {
@@ -107,7 +143,7 @@ export const createOrderTransaction = async ({ studentId, items, slotBookingId, 
       include: { orderItems: true }
     });
 
-    // 7. Record Entitlement Usage Audit
+    // 8. Record Entitlement Usage Audit
     await tx.mealEntitlementUsage.create({
       data: {
         studentId: student.id,
@@ -118,7 +154,7 @@ export const createOrderTransaction = async ({ studentId, items, slotBookingId, 
       }
     });
 
-    // 8. Update Menu Stock Quantities
+    // 9. Update Menu Stock Quantities
     for (const v of validatedItems) {
       const newQty = v.menuItem.availableQuantity - v.quantity;
       await tx.menuItem.update({
@@ -130,7 +166,7 @@ export const createOrderTransaction = async ({ studentId, items, slotBookingId, 
       });
     }
 
-    // 9. Deduct Credits if applicable
+    // 10. Deduct Credits if applicable
     if (finalChargedCredits > 0) {
       const newUsedCredit = creditAccount.usedCredit + finalChargedCredits;
       const newRemainingCredit = creditAccount.remainingCredit - finalChargedCredits;
@@ -158,12 +194,15 @@ export const createOrderTransaction = async ({ studentId, items, slotBookingId, 
     return orderRecord;
   }, { timeout: 15000 });
 
-  // 10. Send Notification
+  // 11. Send Notification
   if (studentUserId && order) {
+    const isSick = order.fulfillmentType === 'SICK_DELIVERY';
     createNotification({
       userId: studentUserId,
-      title: 'Order Placed Successfully',
-      message: `Your order #${order.orderNumber} has been received by the mess kitchen.`,
+      title: isSick ? 'Sick Delivery Order Placed' : 'Order Placed Successfully',
+      message: isSick
+        ? `Your sick delivery meal order #${order.orderNumber} has been received for room delivery to ${order.deliveryHostel} ${order.deliveryRoomNumber}.`
+        : `Your order #${order.orderNumber} has been received by the mess kitchen.`,
       type: 'ORDER_UPDATE'
     }).catch(err => console.error('Notification error:', err));
   }
@@ -204,7 +243,7 @@ export const cancelOrderTransaction = async ({ orderId, studentId }) => {
     // 1. Update Order Status
     const result = await tx.order.update({
       where: { id: orderId },
-      data: { status: 'CANCELLED' }
+      data: { status: 'CANCELLED', deliveryStatus: 'CANCELLED' }
     });
 
     // 2. Restore Menu Quantities
@@ -263,20 +302,35 @@ export const cancelOrderTransaction = async ({ orderId, studentId }) => {
   return updatedOrder;
 };
 
-export const updateOrderStatusChef = async (orderId, newStatus) => {
-  const allowedStatuses = ['ACCEPTED', 'PREPARING', 'READY', 'COLLECTED', 'NO_SHOW', 'CANCELLED'];
+export const updateOrderStatusChef = async (orderId, newStatus, customDeliveryStatus) => {
+  const allowedStatuses = ['ACCEPTED', 'PREPARING', 'READY', 'READY_FOR_DELIVERY', 'OUT_FOR_DELIVERY', 'DELIVERED', 'COLLECTED', 'NO_SHOW', 'CANCELLED'];
   if (!allowedStatuses.includes(newStatus)) {
     throw new Error(`Invalid order status transition to ${newStatus}`);
   }
 
+  // Map delivery status appropriately
+  let newDeliveryStatus = customDeliveryStatus;
+  if (!newDeliveryStatus) {
+    if (newStatus === 'READY_FOR_DELIVERY') newDeliveryStatus = 'READY_FOR_DELIVERY';
+    else if (newStatus === 'OUT_FOR_DELIVERY') newDeliveryStatus = 'OUT_FOR_DELIVERY';
+    else if (newStatus === 'DELIVERED') newDeliveryStatus = 'DELIVERED';
+    else if (newStatus === 'PREPARING') newDeliveryStatus = 'PREPARING';
+    else if (newStatus === 'ACCEPTED') newDeliveryStatus = 'PENDING';
+  }
+
+  const updateData = { status: newStatus };
+  if (newDeliveryStatus) {
+    updateData.deliveryStatus = newDeliveryStatus;
+  }
+
   const order = await prisma.order.update({
     where: { id: orderId },
-    data: { status: newStatus },
+    data: updateData,
     include: { student: { include: { user: true } }, orderItems: true }
   });
 
-  // Auto-generate QR Collection Token when READY
-  if (newStatus === 'READY') {
+  // Auto-generate QR Collection Token when READY and PICKUP
+  if (newStatus === 'READY' && order.fulfillmentType === 'PICKUP') {
     await getOrCreateCollectionToken(order.id, order.studentId).catch(err => console.error('Token gen error:', err));
   }
 
@@ -285,6 +339,9 @@ export const updateOrderStatusChef = async (orderId, newStatus) => {
       ACCEPTED: `Chef accepted your order #${order.orderNumber}.`,
       PREPARING: `Kitchen is now preparing your food for #${order.orderNumber}.`,
       READY: `Order #${order.orderNumber} is READY! View your QR Code for collection.`,
+      READY_FOR_DELIVERY: `Sick delivery order #${order.orderNumber} is prepared and assigned for delivery!`,
+      OUT_FOR_DELIVERY: `🚀 Sick delivery order #${order.orderNumber} is OUT FOR DELIVERY to ${order.deliveryRoomNumber}!`,
+      DELIVERED: `✓ Sick delivery meal #${order.orderNumber} has been DELIVERED to your room.`,
       COLLECTED: `Order #${order.orderNumber} marked as collected. Enjoy your meal!`,
       NO_SHOW: `Order #${order.orderNumber} was marked as NO_SHOW (collection deadline passed).`
     };
@@ -292,7 +349,7 @@ export const updateOrderStatusChef = async (orderId, newStatus) => {
     if (statusMessages[newStatus]) {
       createNotification({
         userId: order.student.userId,
-        title: `Order Status: ${newStatus}`,
+        title: `Order Status: ${newStatus.replace(/_/g, ' ')}`,
         message: statusMessages[newStatus],
         type: newStatus === 'NO_SHOW' ? 'NO_SHOW' : 'ORDER_UPDATE'
       }).catch(err => console.error('Notification error:', err));
@@ -301,3 +358,4 @@ export const updateOrderStatusChef = async (orderId, newStatus) => {
 
   return order;
 };
+
