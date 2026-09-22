@@ -12,7 +12,7 @@ export const AdminSlotsPage = () => {
     try {
       setLoading(true);
       const res = await api.get(`/meal-slots?mealType=${mealType}`);
-      setSlots(res.data.data?.slots || []);
+      setSlots(res.data?.slots || res.data?.data?.slots || (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error(err);
     } finally {

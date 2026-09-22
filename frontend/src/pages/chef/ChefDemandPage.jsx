@@ -16,7 +16,7 @@ export const ChefDemandPage = () => {
         : new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
       const res = await api.get(`/demand/summary?date=${dateStr}`);
-      setDemandData(res.data.data);
+      setDemandData(res.data?.data || res.data);
     } catch (err) {
       console.error(err);
     } finally {

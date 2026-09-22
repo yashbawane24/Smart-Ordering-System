@@ -14,9 +14,20 @@ export const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const DEMO_CREDENTIALS = {
+    STUDENT: { email: 'student@vit.edu', password: 'Password123' },
+    CHEF: { email: 'chef@vit.edu', password: 'Password123' },
+    ADMIN: { email: 'admin@vit.edu', password: 'Password123' }
+  };
+
   const handleRoleSelect = (role) => {
     setActiveRole(role);
     setError('');
+    // Auto-fill demo credentials for that role
+    if (DEMO_CREDENTIALS[role]) {
+      setEmail(DEMO_CREDENTIALS[role].email);
+      setPassword(DEMO_CREDENTIALS[role].password);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -72,6 +83,16 @@ export const LoginPage = () => {
           ))}
         </div>
 
+        <div className="flex items-center justify-between px-2 mb-5 text-[11px] text-[#8E8E93]">
+          <span>Selected role: <strong className="text-white">{activeRole}</strong></span>
+          <button
+            type="button"
+            onClick={() => handleRoleSelect(activeRole)}
+            className="text-[#E50914] hover:underline font-bold transition flex items-center gap-1"
+          >
+            ⚡ Auto-fill credentials
+          </button>
+        </div>
         {/* Error Alert */}
         {error && (
           <div className="mb-5 p-4 bg-[#450A0A] border border-[#E50914] rounded-2xl flex items-center gap-3 text-[#F87171] text-xs font-semibold">

@@ -13,7 +13,7 @@ export const AdminDemandPlanningPage = () => {
       setLoading(true);
       const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
       const res = await api.get(`/demand/summary?date=${tomorrowStr}`);
-      setDemand(res.data.data);
+      setDemand(res.data?.data || res.data);
     } catch (err) {
       console.error(err);
     } finally {

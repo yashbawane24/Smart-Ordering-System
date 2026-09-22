@@ -15,8 +15,9 @@ export const StudentPollsPage = () => {
     try {
       setLoading(true);
       const res = await api.get('/polls');
-      const activePolls = res.data.data?.polls || [];
-      const currentMyVote = res.data.data?.myVote || null;
+      const payload = res.data?.data || res.data || {};
+      const activePolls = payload.polls || (Array.isArray(payload) ? payload : []);
+      const currentMyVote = payload.myVote || null;
       if (activePolls.length > 0) {
         setPoll(activePolls[0]);
       }

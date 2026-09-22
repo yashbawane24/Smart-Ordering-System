@@ -13,7 +13,7 @@ export const QRCollectionPage = () => {
     try {
       setLoading(true);
       const res = await api.get('/orders?status=ALL');
-      const allOrders = res.data.data || [];
+      const allOrders = res.data?.orders || res.data?.data || (Array.isArray(res.data) ? res.data : []);
       const readyOrders = allOrders.filter(o => o.status === 'READY');
       setOrders(readyOrders.length > 0 ? readyOrders : allOrders.slice(0, 3));
       
@@ -34,7 +34,7 @@ export const QRCollectionPage = () => {
   const fetchQR = async (orderId) => {
     try {
       const res = await api.get(`/collection/orders/${orderId}/collection-qr`);
-      setQrTokenData(res.data.data);
+      setQrTokenData(res.data?.data || res.data);
     } catch (err) {
       console.error(err);
     }

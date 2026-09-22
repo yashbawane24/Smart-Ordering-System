@@ -15,7 +15,7 @@ export const AdminFeedbackPage = () => {
     try {
       setLoading(true);
       const res = await api.get('/feedback');
-      setData(res.data.data);
+      setData(res.data?.data || res.data);
     } catch (err) {
       console.error(err);
     } finally {

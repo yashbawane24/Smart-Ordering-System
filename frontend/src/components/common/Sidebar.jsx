@@ -23,7 +23,8 @@ import {
   Layers,
   Leaf,
   HeartPulse,
-  ShieldCheck
+  ShieldCheck,
+  PieChart
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 

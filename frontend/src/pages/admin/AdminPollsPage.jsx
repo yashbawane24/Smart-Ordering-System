@@ -16,7 +16,7 @@ export const AdminPollsPage = () => {
     try {
       setLoading(true);
       const res = await api.get('/polls');
-      setPolls(res.data.data?.polls || []);
+      setPolls(res.data?.polls || res.data?.data?.polls || (Array.isArray(res.data) ? res.data : []));
     } catch (err) {
       console.error(err);
     } finally {

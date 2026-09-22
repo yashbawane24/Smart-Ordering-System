@@ -18,7 +18,7 @@ export const ChefVerifyQRPage = () => {
       setVerificationResult(null);
 
       const res = await api.post('/collection/verify', { token: tokenInput.trim() });
-      setVerificationResult(res.data.data);
+      setVerificationResult(res.data?.data || res.data);
       setTokenInput('');
     } catch (err) {
       setErrorMsg(err.message || 'Verification failed. Token invalid, expired, or already used.');

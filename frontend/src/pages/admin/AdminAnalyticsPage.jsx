@@ -14,7 +14,7 @@ export const AdminAnalyticsPage = () => {
     try {
       setLoading(true);
       const res = await api.get('/analytics/consumption');
-      setAnalytics(res.data.data);
+      setAnalytics(res.data?.data || res.data);
     } catch (err) {
       console.error(err);
     } finally {
